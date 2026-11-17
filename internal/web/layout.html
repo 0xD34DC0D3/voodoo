@@ -6,13 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{.Title}} · voodoo</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="/static/fonts/atkinson-hyperlegible-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fonts/atkinson-hyperlegible-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/theme.css">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header>
-    <a class="brand" href="/">voodoo:~$ <span class="cursor" aria-hidden="true">▌</span></a>
+    <a class="brand" href="/"><span class="tile" aria-hidden="true">0x</span><span>voo<span class="dim">doo</span></span></a>
     {{if .UserEmail}}
     <nav aria-label="Primary">
       <a href="/" {{if eq .Nav "home"}}aria-current="page"{{end}}>home</a>
@@ -34,7 +36,10 @@
 
 {{define "bottom"}}
   </main>
-  <footer>·· <a href="https://github.com/0xD34DC0D3/voodoo" rel="noopener"><em>voodoo</em></a> ··</footer>
+  <footer>
+    <span><a href="https://github.com/0xD34DC0D3/voodoo" rel="noopener">voodoo</a> · deadcode auth</span>
+    <span class="hex">0xD34DC0D3</span>
+  </footer>
 </body>
 </html>
 {{end}}

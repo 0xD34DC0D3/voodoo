@@ -39,6 +39,10 @@ CI runs the same checks and fails if generated sqlc code is out of date.
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/)
   (`feat(auth): ...`, `fix(deploy): ...`, `docs: ...`), short and imperative.
 - Keep pages working without JavaScript; the CSP forbids inline script.
+- The UI follows the org's shared design system. Colors, fonts, borders and
+  shadows live in `internal/web/static/theme.css`, generated from the
+  0xD34DC0D3/website repo by `make theme` (point `WEBSITE=` at a local
+  checkout). Don't hand-edit it; restyle markup in `style.css`.
 - Update `docs/` when you change routes, configuration or behaviour.
 
 By contributing you agree that your contributions are licensed under the

@@ -97,5 +97,5 @@ as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-MIT, see [LICENSE](LICENSE). The bundled Atkinson Hyperlegible Mono font is
+MIT, see [LICENSE](LICENSE). The bundled Atkinson Hyperlegible Next and JetBrains Mono fonts are
 under the SIL Open Font License 1.1 ([OFL.txt](internal/web/static/fonts/OFL.txt)).

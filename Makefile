@@ -1,6 +1,6 @@
 BIN := voodoo
 
-.PHONY: help build run test fmt vet tidy tools vulncheck sqlc migrate-new clean deploy
+.PHONY: help build run test fmt vet tidy tools vulncheck sqlc migrate-new clean deploy theme
 
 help:
 	@echo "Targets:"
@@ -13,6 +13,7 @@ help:
 	@echo "  vulncheck     govulncheck ./... (allowlist: deploy/govulncheck.allow)"
 	@echo "  sqlc          regenerate sqlc code"
 	@echo "  migrate-new   create a new goose migration  (NAME=add_thing)"
+	@echo "  theme         regenerate design tokens from the org website  (WEBSITE=../0xD34DC0D3/website)"
 	@echo "  clean         remove build artifacts"
 	@echo "  deploy        gate (clean tree, vet, test, vulncheck), back up, install, migrate, health-check"
 
@@ -59,6 +60,11 @@ sqlc:
 migrate-new:
 	@test -n "$(NAME)" || (echo "usage: make migrate-new NAME=add_thing" && exit 1)
 	goose -dir migrations create $(NAME) sql
+
+# Pull the shared design tokens from the org website repo (a local checkout).
+WEBSITE ?= ../0xD34DC0D3/website
+theme:
+	./scripts/sync-theme.sh $(WEBSITE)
 
 clean:
 	rm -rf bin/

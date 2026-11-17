@@ -1,29 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="voodoo mask">
-  <style>
-    svg { color: #000000; }
-    @media (prefers-color-scheme: dark) { svg { color: #e8decb; } }
-  </style>
-  <g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <!-- mask outline: rounded brow tapering to a chin -->
-    <path d="M32 8
-             C 19 8, 13 17, 13 29
-             C 13 45, 23 55, 32 57
-             C 41 55, 51 45, 51 29
-             C 51 17, 45 8, 32 8 Z"/>
-
-    <!-- slanted eyes -->
-    <path d="M19 27 Q24 22 29 27 Q24 31 19 27 Z" fill="currentColor"/>
-    <path d="M35 27 Q40 22 45 27 Q40 31 35 27 Z" fill="currentColor"/>
-
-    <!-- nose -->
-    <path d="M32 30 L28 41 L36 41 Z"/>
-
-    <!-- stitched mouth -->
-    <path d="M23 47 H41"/>
-    <path d="M27 44 V50 M32 44 V50 M37 44 V50"/>
-
-    <!-- cheek / brow tribal marks -->
-    <path d="M17 33 V40 M47 33 V40"/>
-    <path d="M26 15 H38"/>
+  <!-- the org's favicon tile (accent square, ink border) with voodoo's mask inside -->
+  <rect x="3" y="3" width="58" height="58" rx="2" fill="#d2ff3a" stroke="#0b0b0b" stroke-width="6"/>
+  <g fill="none" stroke="#0b0b0b" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M32 12 C 22 12, 17 19, 17 28 C 17 41, 25 49, 32 51 C 39 49, 47 41, 47 28 C 47 19, 42 12, 32 12 Z"/>
+    <path d="M22 27 Q26 23 30 27 Q26 30 22 27 Z" fill="#0b0b0b"/>
+    <path d="M34 27 Q38 23 42 27 Q38 30 34 27 Z" fill="#0b0b0b"/>
+    <path d="M25 42 H39 M28.5 39 V45 M35.5 39 V45"/>
   </g>
 </svg>

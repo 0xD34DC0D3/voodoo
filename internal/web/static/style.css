@@ -1,46 +1,74 @@
-/* voodoo — terminal-amber theme */
+/* voodoo — the deadcode neo-brutalist design system.
+   Tokens (colors, fonts, borders, shadows) come from theme.css, which is
+   generated from the org website by scripts/sync-theme.sh; this file only
+   maps them onto voodoo's markup. Rules from the website's design guide:
+   visible ink borders, solid offset shadows, 2px radius, one accent action
+   per view, mono for anything a machine would print. */
 
 /* ---------------------------------------------------------------- fonts */
 
 @font-face {
-  font-family: "Atkinson Hyperlegible Mono";
+  font-family: "Atkinson Hyperlegible Next";
   font-style: normal;
   font-weight: 200 800;
   font-display: swap;
-  src: url("/static/fonts/atkinson-hyperlegible-mono-latin.woff2") format("woff2");
+  src: url("/static/fonts/atkinson-hyperlegible-next-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
     U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
     U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: "Atkinson Hyperlegible Mono";
+  font-family: "Atkinson Hyperlegible Next";
   font-style: normal;
   font-weight: 200 800;
   font-display: swap;
-  src: url("/static/fonts/atkinson-hyperlegible-mono-latin-ext.woff2") format("woff2");
+  src: url("/static/fonts/atkinson-hyperlegible-next-latin-ext.woff2") format("woff2");
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
     U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
-    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("/static/fonts/jetbrains-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("/static/fonts/jetbrains-mono-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F,
     U+A720-A7FF;
 }
 
 /* ----------------------------------------------------------------- base */
 
 :root {
-  --bg: #16130e;
-  --ink: #e8decb;
-  /* --dim was #9b8f76 (~4.3:1 on --bg) which fails WCAG AA for the small
-     text it's used on. Nudged lighter to clear 4.5:1 without losing the
-     muted feel. --faint keeps the older, dimmer tone for purely decorative
-     chrome (footer, leader dots) where contrast isn't load-bearing. */
-  --dim: #b3a589;
-  --faint: #877c66;
-  --line: #3b3327;
-  --amber: #ffb000;
-  --red: #e8694a;
-  --mono: "Atkinson Hyperlegible Mono", ui-monospace, SFMono-Regular, Menlo,
-    Consolas, "Liberation Mono", monospace;
+  /* aliases so the rules below read short */
+  --canvas: var(--color-canvas);
+  --surface: var(--color-surface);
+  --ink: var(--color-ink);
+  --muted: var(--color-muted);
+  --rule: var(--color-rule);
+  --accent: var(--color-accent);
+  --danger: var(--color-danger);
+  --info: var(--color-info);
+  --b: var(--border-width-brut);
+  --b-sm: var(--border-width-brut-sm);
+  --sans: var(--font-sans);
+  --mono: var(--font-mono);
 
   /* vertical rhythm — one scale, used everywhere so margins share a grid */
   --s1: 0.5rem;
@@ -49,10 +77,6 @@
   --s4: 1.5rem;
   --s5: 2.5rem;
   --s6: 3.5rem;
-
-  /* faint amber washes for zebra rows / textures, kept in one place */
-  --wash: rgba(255, 176, 0, 0.04);
-  --wash-soft: rgba(255, 176, 0, 0.022);
 }
 
 * {
@@ -61,46 +85,74 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--canvas);
   color: var(--ink);
-  font: 15px/1.65 var(--mono);
+  font: 16px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 ::selection {
-  background: var(--amber);
-  color: var(--bg);
+  background: var(--accent);
+  color: var(--ink);
 }
 
+:focus-visible {
+  outline: var(--b) solid var(--info);
+  outline-offset: 3px;
+}
+
+/* inline links: the website's .link */
 a {
-  color: var(--amber);
-  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--info);
+  text-decoration-thickness: var(--b);
+  text-underline-offset: 4px;
 }
 
 a:hover {
-  background: var(--amber);
-  color: var(--bg);
+  background: var(--accent);
 }
 
-a,
+/* "brut-press": hover lifts, active presses flat */
 button,
-.cards a,
 a.btn,
-tbody tr,
-summary {
-  transition: background 90ms linear, color 90ms linear,
-    border-color 90ms linear, transform 90ms linear;
+.confirm > summary,
+.cards a {
+  transition: translate 75ms ease-out, box-shadow 75ms ease-out;
 }
 
-a:focus-visible,
-button:focus-visible,
-summary:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 1px solid var(--amber);
-  outline-offset: 2px;
+button:hover,
+a.btn:hover,
+.confirm > summary:hover,
+.cards a:hover {
+  box-shadow: var(--shadow-brut-lift);
+  translate: -2px -2px;
+}
+
+button:active,
+a.btn:active,
+.confirm > summary:active,
+.cards a:active {
+  box-shadow: none;
+  translate: 4px 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:hover,
+  a.btn:hover,
+  .confirm > summary:hover,
+  .cards a:hover,
+  button:active,
+  a.btn:active,
+  .confirm > summary:active,
+  .cards a:active {
+    translate: none;
+  }
 }
 
 /* skip link — first focusable element, hidden until focused */
@@ -112,63 +164,75 @@ select:focus-visible {
 .skip:focus {
   left: 0;
   top: 0;
-  z-index: 20;
-  background: var(--amber);
-  color: var(--bg);
-  padding: 0.5rem 0.9rem;
+  z-index: 30;
+  background: var(--accent);
+  padding: 0.75rem;
 }
 
 /* --------------------------------------------------------------- chrome */
 
 header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem 1.5rem;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--line);
+  gap: 0.75rem 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--canvas);
+  border-bottom: var(--b) solid var(--ink);
+}
+
+/* the website's Logo: an accent "0x" tile beside the wordmark */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.brand:hover {
+  background: none;
+}
+
+.brand .tile {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  font: 700 0.875rem var(--mono);
+  background: var(--accent);
+  border: var(--b) solid var(--ink);
+  box-shadow: var(--shadow-brut-sm);
+}
+
+.brand .dim {
+  color: var(--muted);
 }
 
 header nav {
   display: flex;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }
 
+header nav a {
+  font: 700 0.75rem var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  padding: 0.25rem 0.75rem;
+  border: var(--b-sm) solid transparent;
+}
+
+header nav a:hover,
 header nav a[aria-current="page"] {
-  color: var(--amber);
-  border-bottom: 1px solid var(--amber);
-}
-
-/* the brand reads as a shell prompt and carries the one live (blinking)
-   caret on the page */
-.brand {
-  color: var(--amber);
-  letter-spacing: 0.04em;
-}
-
-.brand:hover {
-  background: var(--amber);
-  color: var(--bg);
-}
-
-.brand:hover .cursor {
-  color: var(--bg);
-}
-
-.cursor {
-  color: var(--amber);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cursor {
-    animation: blink 1.2s steps(1) infinite;
-  }
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
+  background: var(--accent);
+  border-color: var(--ink);
 }
 
 .who {
@@ -176,8 +240,12 @@ header nav a[aria-current="page"] {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--dim);
-  font-size: 0.85rem;
+  font: 0.75rem var(--mono);
+  color: var(--muted);
+}
+
+.who form {
+  margin: 0;
 }
 
 /* a long email must never blow out the header bar on narrow screens */
@@ -189,140 +257,146 @@ header nav a[aria-current="page"] {
 }
 
 main {
-  /* grow to push the footer down, but DON'T justify content into the void:
-     content sits at a deliberate top offset rather than a centered block
-     floating in an empty viewport. */
+  /* grow to push the footer down; content sits at a deliberate top offset */
   flex: 1 0 auto;
   width: 100%;
-  max-width: 720px;
+  max-width: 48rem;
   margin: 0 auto;
   padding: var(--s6) 1.5rem var(--s5);
 }
 
 /* table-heavy pages opt into a wider measure */
 main.wide {
-  max-width: 960px;
+  max-width: 72rem;
 }
 
 footer {
-  padding: 0.6rem 1.25rem;
-  border-top: 1px solid var(--line);
-  color: var(--faint);
-  font-size: 0.75rem;
-  text-align: center;
-  letter-spacing: 0.2em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: var(--ink);
+  color: var(--canvas);
+  border-top: var(--b) solid var(--ink);
+  font: 0.75rem var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+footer a {
+  text-decoration-color: var(--accent);
+}
+
+footer a:hover {
+  color: var(--ink);
+}
+
+footer .hex {
+  color: var(--accent);
+  text-transform: none;
 }
 
 /* ----------------------------------------------------------- typography */
 
 h1 {
-  font-size: 1.35rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
   margin: 0 0 var(--s5);
 }
 
-h1::before {
-  content: "> ";
-  color: var(--amber);
-}
-
-/* h1 gets the bright amber "> " (a command — you are here); h2 gets a dim
-   "## " (a section comment). A small glyph hierarchy, not just a rule. */
+/* the website's section header: a mono eyebrow over a hairline rule */
 h2 {
-  font-size: 0.85rem;
+  font: 700 0.75rem var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--dim);
+  letter-spacing: 0.2em;
+  color: var(--muted);
   margin: var(--s5) 0 var(--s3);
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.4rem;
-}
-
-h2::before {
-  content: "## ";
-  color: var(--line);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.5rem;
 }
 
 p {
   margin: 0 0 var(--s3);
 }
 
-code {
-  color: var(--amber);
+code,
+pre {
+  font-family: var(--mono);
+  font-size: 0.875em;
 }
 
 .muted {
-  color: var(--dim);
+  color: var(--muted);
 }
 
-.note {
-  color: var(--dim);
-  font-size: 0.8rem;
-}
-
-/* a note that closes out a table or list */
+.note,
 .footnote {
-  color: var(--dim);
-  font-size: 0.8rem;
-  margin-top: var(--s2);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.footnote {
+  margin-top: var(--s3);
 }
 
 /* a shell-style back link: "cd .." with the path it returns to */
 .backlink {
-  font-size: 0.8rem;
-  margin-bottom: var(--s4);
+  font: 0.75rem var(--mono);
+  margin: calc(-1 * var(--s4)) 0 var(--s4);
 }
 
 .backlink .path {
-  color: var(--faint);
+  color: var(--muted);
 }
 
 /* ---------------------------------------------------------------- forms */
 
 label {
   display: block;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.25rem;
 }
 
 label span {
   display: block;
-  font-size: 0.72rem;
+  font: 700 0.75rem var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--dim);
-  margin-bottom: 0.35rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
 }
 
-input:not([type="checkbox"]):not([type="radio"]) {
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+select,
+textarea {
   width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--line);
+  background: var(--surface);
   color: var(--ink);
-  padding: 0.55rem 0.7rem;
-  font: inherit;
-  border-radius: 0;
-}
-
-input[readonly] {
-  color: var(--dim);
-  border-style: dashed;
+  border: var(--b) solid var(--ink);
+  border-radius: var(--radius-brut);
+  box-shadow: var(--shadow-brut-sm);
+  padding: 0.75rem 1rem;
+  font: 0.875rem var(--mono);
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  outline: none;
-  border-color: var(--amber);
-  /* a faint inner glow so an active terminal field is unmistakable */
-  box-shadow: inset 0 0 0 1px rgba(255, 176, 0, 0.25);
+  box-shadow: var(--shadow-brut);
 }
 
-/* a label whose control is a checkbox: keep the box at its natural size and
-   sit it on its own line under the caption */
+input[readonly] {
+  background: var(--canvas);
+  color: var(--muted);
+  border-style: dashed;
+  box-shadow: none;
+}
+
 label.checkbox input[type="checkbox"] {
-  width: auto;
-  accent-color: var(--amber);
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--ink);
 }
 
 .form-row {
@@ -344,58 +418,61 @@ label.checkbox input[type="checkbox"] {
 
 /* -------------------------------------------------------------- buttons */
 
-button {
-  font: inherit;
-  font-size: 0.78rem;
+/* a bare <button> is the primary (.btn-primary); .ghost is the secondary
+   (.btn); .danger is destructive. */
+button,
+a.btn,
+.confirm > summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font: 700 0.875rem var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  background: var(--amber);
-  border: 1px solid var(--amber);
-  color: var(--bg);
-  padding: 0.55rem 1.2rem;
-  cursor: pointer;
-  border-radius: 0;
-}
-
-button:hover {
-  background: transparent;
-  color: var(--amber);
-}
-
-/* a click should feel physical */
-button:active {
-  transform: translateY(1px);
-}
-
-button.ghost {
-  background: transparent;
-  color: var(--dim);
-  border-color: var(--line);
-  padding: 0.3rem 0.7rem;
-  font-size: 0.72rem;
-}
-
-button.ghost:hover {
+  letter-spacing: 0.05em;
+  text-decoration: none;
   color: var(--ink);
-  border-color: var(--dim);
+  background: var(--accent);
+  border: var(--b) solid var(--ink);
+  border-radius: var(--radius-brut);
+  box-shadow: var(--shadow-brut);
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
 }
 
-button.danger {
-  background: transparent;
-  color: var(--red);
-  border-color: var(--red);
-  padding: 0.3rem 0.7rem;
-  font-size: 0.72rem;
+button.danger,
+.confirm > summary {
+  background: var(--danger);
+  color: var(--surface);
 }
 
-button.danger:hover {
-  background: var(--red);
-  color: var(--bg);
+button.ghost,
+a.btn,
+.confirm.neutral > summary {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* small buttons (.btn-sm) wherever they sit in a row or the header */
+.who button,
+td button,
+td a.btn,
+.confirm > summary,
+.confirm-pop button,
+.secret button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  box-shadow: var(--shadow-brut-sm);
+}
+
+a.btn:hover {
+  background: var(--surface);
 }
 
 .actions {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -403,24 +480,6 @@ button.danger:hover {
 .actions form {
   display: inline;
   margin: 0;
-}
-
-/* a link that needs to read as a button alongside real buttons (e.g. the
-   "edit" action sitting next to ghost/danger buttons in a row) */
-a.btn {
-  display: inline-block;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--dim);
-  border: 1px solid var(--line);
-  padding: 0.3rem 0.7rem;
-}
-
-a.btn:hover {
-  background: transparent;
-  color: var(--ink);
-  border-color: var(--dim);
 }
 
 /* ------------------------------------------------------ inline confirm */
@@ -435,15 +494,6 @@ a.btn:hover {
 
 .confirm > summary {
   list-style: none;
-  display: inline-block;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid var(--red);
-  color: var(--red);
-  cursor: pointer;
-  user-select: none;
 }
 
 .confirm > summary::-webkit-details-marker {
@@ -451,38 +501,27 @@ a.btn:hover {
 }
 
 .confirm[open] > summary {
-  background: var(--red);
-  color: var(--bg);
-}
-
-.confirm.neutral > summary {
-  border-color: var(--line);
-  color: var(--dim);
-}
-
-.confirm.neutral[open] > summary {
-  background: var(--line);
-  color: var(--ink);
+  box-shadow: none;
+  translate: 2px 2px;
 }
 
 .confirm-pop {
   position: absolute;
   z-index: 10;
   right: 0;
-  margin-top: 0.4rem;
+  margin-top: 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   /* cap the width and let the prompt text wrap: a long email in the message
      must not stretch the popover off the column edge and clip the button */
   width: max-content;
   max-width: min(20rem, 80vw);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-left: 2px solid var(--amber);
-  padding: 0.6rem 0.75rem;
-  font-size: 0.78rem;
-  color: var(--dim);
+  background: var(--surface);
+  border: var(--b) solid var(--ink);
+  box-shadow: var(--shadow-brut);
+  padding: 0.75rem;
+  font-size: 0.875rem;
 }
 
 .confirm-pop > span {
@@ -499,143 +538,122 @@ a.btn:hover {
 
 .table-wrap {
   overflow-x: auto;
+  background: var(--surface);
+  border: var(--b) solid var(--ink);
+  border-radius: var(--radius-brut);
+  box-shadow: var(--shadow-brut);
+}
+
+/* the confirm popovers must escape the scroll box when there is room */
+@media (min-width: 601px) {
+  .table-wrap {
+    overflow: visible;
+  }
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
 }
 
 th {
   text-align: left;
-  font-size: 0.68rem;
+  font: 700 0.75rem var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--dim);
-  border-bottom: 1px solid var(--dim);
-  padding: 0.5rem 0.6rem;
-}
-
-thead th {
-  position: sticky;
-  top: 0;
-  /* sit above hovered-row backgrounds and the amber first-cell tick so the
-     header text stays readable as rows scroll under it */
-  z-index: 1;
-  background: var(--bg);
+  letter-spacing: 0.05em;
+  background: var(--canvas);
+  border-bottom: var(--b) solid var(--ink);
+  padding: 0.75rem;
 }
 
 td {
-  padding: 0.55rem 0.6rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--rule);
   vertical-align: middle;
 }
 
-/* dates/times read as data — align them on a tabular grid */
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* dates/times read as data: mono, tabular */
 td.muted {
+  font: 0.75rem var(--mono);
   font-variant-numeric: tabular-nums;
 }
 
-td code {
-  font-size: 0.82rem;
-}
-
-/* faintest zebra wash — like alternating terminal lines */
-tbody tr:nth-child(even) td {
-  background: var(--wash-soft);
-}
-
-/* row hover: a brighter wash plus an amber tick on the first cell, like a
-   cursor selecting the line */
 tbody tr:hover td {
-  background: var(--wash);
-}
-
-tbody tr:hover td:first-child {
-  box-shadow: inset 2px 0 0 var(--amber);
-}
-
-/* In dense lists a full amber hover block on a long title is a lot of flashing
-   as the cursor moves — underline the link instead, reserve the block for
-   short interactive links elsewhere. */
-td a:not(.btn):hover {
-  background: none;
-  color: var(--amber);
-  text-decoration: underline;
+  background: var(--canvas);
 }
 
 /* ----------------------------------------------------------- components */
 
 .badge {
-  font-size: 0.68rem;
+  display: inline-flex;
+  align-items: center;
+  font: 700 0.75rem var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border: 1px solid;
-  padding: 0.05rem 0.4rem;
+  letter-spacing: 0.05em;
+  background: var(--surface);
+  border: var(--b-sm) solid var(--ink);
+  padding: 0.125rem 0.5rem;
   white-space: nowrap;
 }
 
 .badge.attn {
-  color: var(--amber);
-  border-color: var(--amber);
+  background: var(--accent);
 }
 
 .badge.off {
-  color: var(--dim);
-  border-color: var(--line);
+  color: var(--muted);
 }
 
 .badge.bad {
-  color: var(--red);
-  border-color: var(--red);
+  background: var(--danger);
+  color: var(--surface);
+}
+
+/* callouts: a brut box with a thick left edge */
+.error,
+.flash {
+  border: var(--b) solid var(--ink);
+  border-left-width: 12px;
+  box-shadow: var(--shadow-brut);
+  padding: 0.75rem 1rem;
+  margin-bottom: var(--s4);
+  font-weight: 700;
 }
 
 .error {
-  border: 1px solid var(--red);
-  color: var(--red);
-  padding: 0.6rem 0.8rem;
-  margin-bottom: 1.5rem;
-  font-size: 0.85rem;
+  background: var(--danger);
+  color: var(--surface);
 }
 
-.error::before {
-  content: "! ";
-  font-weight: 700;
-}
-
-/* one-shot success notice after a redirect — amber sibling of .error */
 .flash {
-  border: 1px solid var(--amber);
-  color: var(--amber);
-  padding: 0.6rem 0.8rem;
-  margin-bottom: 1.5rem;
-  font-size: 0.85rem;
+  background: var(--accent);
 }
 
-.flash::before {
-  content: "\2713  ";
-  font-weight: 700;
-}
-
-/* a framed block of "output" — amber top edge anchors it to the page */
+/* a framed block of "output" */
 .panel {
-  border: 1px solid var(--line);
-  border-top: 2px solid var(--amber);
-  padding: 1.25rem 1.4rem;
+  background: var(--surface);
+  border: var(--b) solid var(--ink);
+  border-radius: var(--radius-brut);
+  box-shadow: var(--shadow-brut);
+  padding: 1.25rem;
   margin-bottom: var(--s5);
 }
 
 .panel .status {
-  margin: 0 0 0.9rem;
+  margin: 0 0 1rem;
 }
 
 .panel .caption {
-  color: var(--dim);
-  font-size: 0.72rem;
+  color: var(--muted);
+  font: 700 0.75rem var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-right: 0.6rem;
+  letter-spacing: 0.2em;
+  margin-right: 0.5rem;
 }
 
 /* key/value rows rendered like aligned config output: LABEL ···· value */
@@ -647,22 +665,21 @@ td a:not(.btn):hover {
   display: flex;
   align-items: baseline;
   gap: 0 0.6ch;
-  padding: 0.15rem 0;
+  padding: 0.25rem 0;
 }
 
 .kv dt {
   flex: 0 0 auto;
-  font-size: 0.72rem;
+  font: 700 0.75rem var(--mono);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--dim);
+  letter-spacing: 0.05em;
   margin: 0;
 }
 
 .kv .lead {
   flex: 1 1 auto;
   align-self: stretch;
-  border-bottom: 1px dotted var(--line);
+  border-bottom: 2px dotted var(--rule);
   transform: translateY(-0.3em);
   min-width: 1.5rem;
 }
@@ -671,33 +688,34 @@ td a:not(.btn):hover {
   flex: 0 1 auto;
   margin: 0;
   text-align: right;
+  font: 0.875rem var(--mono);
   overflow-wrap: anywhere;
 }
 
 /* one-time reveal of a freshly created secret (API key, invite link) — the
-   loudest moment in the app, so give it the strongest amber treatment */
+   loudest moment in the app: accent box, biggest shadow, an ink code block */
 .secret {
-  border: 1px solid var(--amber);
-  border-left-width: 3px;
-  padding: 1.2rem;
-  margin: var(--s4) 0;
+  background: var(--accent);
+  border: var(--b) solid var(--ink);
+  box-shadow: var(--shadow-brut-lg);
+  padding: 1.25rem;
+  margin: var(--s4) 0 var(--s5);
 }
 
 .secret .warn {
-  color: var(--amber);
+  font: 700 0.75rem var(--mono);
   text-transform: uppercase;
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.05em;
   margin: 0 0 0.75rem;
 }
 
-/* the copyable target reads as "hot": amber dashed border, faint wash, and a
-   click selects the whole value (the JS-free copy affordance) */
+/* click selects the whole value (the JS-free copy affordance) */
 .secret pre {
-  margin: 0;
-  padding: 0.85rem;
-  border: 1px dashed var(--amber);
-  background: var(--wash);
+  margin: 0 0 0.75rem;
+  padding: 1rem;
+  background: var(--ink);
+  color: var(--canvas);
+  border: var(--b) solid var(--ink);
   overflow-x: auto;
   cursor: pointer;
   user-select: all;
@@ -705,137 +723,122 @@ td a:not(.btn):hover {
 }
 
 .secret .hint {
-  color: var(--dim);
-  font-size: 0.8rem;
-  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  margin: 0;
 }
 
-/* a terminal "no output" line, left-aligned with a dim glyph */
+/* "no output" */
 .empty {
-  color: var(--dim);
-  border: 1px dashed var(--line);
-  border-left: 2px solid var(--line);
-  padding: 1.1rem 1.25rem;
-  text-align: left;
-  font-size: 0.85rem;
+  color: var(--muted);
+  border: var(--b) dashed var(--rule);
+  padding: 1.25rem;
+  font: 0.875rem var(--mono);
 }
 
-.empty::before {
-  content: "— ";
-  color: var(--faint);
-}
-
+/* the website's AppCard: pressable tiles with a launch arrow */
 .cards {
   list-style: none;
-  margin: 0 0 var(--s5);
+  margin: var(--s5) 0;
   padding: 0;
   display: grid;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1.5rem;
 }
 
 .cards a {
-  position: relative;
-  display: block;
-  border: 1px solid var(--line);
-  padding: 1rem 1.25rem;
-  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  background: var(--surface);
+  border: var(--b) solid var(--ink);
+  border-radius: var(--radius-brut);
+  box-shadow: var(--shadow-brut);
+  padding: 1.25rem;
+  text-decoration: none;
+  font-weight: 400;
 }
 
 .cards a:hover {
-  background: none;
-  border-color: var(--amber);
-}
-
-.cards a:hover strong {
-  color: var(--amber);
+  background: var(--surface);
 }
 
 .cards strong {
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.85rem;
-  margin-bottom: 0.25rem;
-}
-
-.cards strong::before {
-  content: "› ";
-  color: var(--amber);
+  font-size: 1.25rem;
 }
 
 .cards span {
-  color: var(--dim);
-  font-size: 0.82rem;
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
-/* an arrow that slides on hover — reads as "enter this" */
 .cards a::after {
-  content: "→";
-  position: absolute;
-  right: 1.25rem;
-  top: 1rem;
-  color: var(--line);
-}
-
-.cards a:hover::after {
-  color: var(--amber);
-  transform: translateX(3px);
+  content: "Open →";
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font: 700 0.75rem var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* ---------------------------------------------------------- auth screens */
 
+/* login / signup / reset: one raised card on the dot-grid hero texture */
+main:has(> .auth) {
+  max-width: none;
+  background-image: radial-gradient(var(--ink) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: -11px -11px;
+}
+
 .auth {
-  max-width: 400px;
-  margin: 8vh auto 0;
+  max-width: 28rem;
+  margin: 4vh auto 0;
+  background: var(--surface);
+  border: var(--b) solid var(--ink);
+  border-radius: var(--radius-brut);
+  box-shadow: var(--shadow-brut-lg);
+  padding: 2rem;
+}
+
+.auth h1 {
+  font-size: 2rem;
+  margin-bottom: var(--s4);
 }
 
 .auth button[type="submit"] {
   width: 100%;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 }
 
 .auth .note {
-  margin-top: 1.5rem;
-}
-
-/* ---------------------------------------------------------- form controls */
-
-select,
-textarea {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  color: var(--ink);
-  padding: 0.55rem 0.7rem;
-  font: inherit;
-  border-radius: 0;
+  margin: var(--s4) 0 0;
 }
 
 /* --------------------------------------------------- oauth: consent + apps */
 
 /* The consent screen is a decision, not a report, so it is boxed as one
-   self-contained thing the user acts on. Amber on the leading edge only —
-   .secret owns the full-amber treatment, and this must not outshout it. */
+   self-contained thing the user acts on. */
 .consent {
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--amber);
-  padding: 1.2rem;
+  background: var(--surface);
+  border: var(--b) solid var(--ink);
+  box-shadow: var(--shadow-brut-lg);
+  padding: 1.5rem;
   margin: var(--s4) 0;
 }
 
 .consent-lede {
   margin-top: 0;
-  font-size: 1rem;
+  font-size: 1.125rem;
 }
 
-/* Scoped to .consent so it cannot disturb .secret .warn, which is the
-   uppercase-label variant. This one is a full sentence and needs the room. */
 .consent .warn {
-  color: var(--amber);
-  border: 1px dashed var(--amber);
-  padding: 0.8rem 0.9rem;
-  font-size: 0.82rem;
-  margin: var(--s3) 0;
+  background: var(--color-tint-2);
+  border: var(--b) solid var(--ink);
+  border-left-width: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  margin: var(--s4) 0;
 }
 
 /* What an app is being granted, as a checklist rather than prose — the point is
@@ -847,21 +850,22 @@ textarea {
 }
 
 .scopes li {
-  border-left: 2px solid var(--line);
-  padding: 0.35rem 0 0.35rem 0.75rem;
-  margin-bottom: 0.35rem;
+  border-left: var(--b) solid var(--ink);
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  margin-bottom: 0.5rem;
+  font: 0.875rem var(--mono);
 }
 
 /* the same list inside a table cell, where it has to stay compact */
 .scopes.tight {
   margin: 0;
-  font-size: 0.8rem;
 }
 
 .scopes.tight li {
   border-left: 0;
   padding: 0;
   margin: 0;
+  font-size: 0.75rem;
 }
 
 /* registered redirect URIs in the admin clients table */
@@ -882,8 +886,22 @@ textarea {
    action buttons). Collapse each row into a stacked card, labelling cells
    from their header text via data-label. */
 @media (max-width: 600px) {
+  header {
+    padding: 0.75rem 1rem;
+  }
+
   main {
     padding: var(--s5) 1rem var(--s4);
+  }
+
+  .auth {
+    padding: 1.25rem;
+  }
+
+  .table-wrap {
+    background: none;
+    border: 0;
+    box-shadow: none;
   }
 
   .table-wrap table,
@@ -901,10 +919,11 @@ textarea {
   }
 
   .table-wrap tr {
-    border: 1px solid var(--line);
-    border-left: 2px solid var(--amber);
+    background: var(--surface);
+    border: var(--b) solid var(--ink);
+    box-shadow: var(--shadow-brut);
     margin-bottom: 1rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.75rem;
   }
 
   .table-wrap td {
@@ -912,22 +931,17 @@ textarea {
     padding: 0.25rem 0;
   }
 
-  tbody tr:nth-child(even) td,
   tbody tr:hover td {
     background: none;
-  }
-
-  tbody tr:hover td:first-child {
-    box-shadow: none;
   }
 
   .table-wrap td::before {
     content: attr(data-label);
     display: block;
-    font-size: 0.66rem;
+    font: 700 0.75rem var(--mono);
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--dim);
+    letter-spacing: 0.05em;
+    color: var(--muted);
   }
 
   /* cells with no header (the actions column) shouldn't print an empty label */
