@@ -50,20 +50,22 @@ func TestCheckServe(t *testing.T) {
 		secure bool
 		base   string
 		domain string
+		site   string
 		ok     bool
 	}{
-		{"insecure dev needs no base url", false, "", "", true},
-		{"insecure rejects a cookie domain", false, "", ".example.com", false},
-		{"secure requires base url", true, "", "", false},
-		{"secure rejects http", true, "http://auth.example.com", "", false},
-		{"secure rejects missing host", true, "https://", "", false},
-		{"secure rejects bare host", true, "auth.example.com", "", false},
-		{"secure accepts https", true, "https://auth.example.com", "", true},
-		{"secure accepts https with a cookie domain", true, "https://auth.example.com", ".example.com", true},
+		{"insecure dev needs no base url", false, "", "", "https://example.com", true},
+		{"insecure rejects a cookie domain", false, "", ".example.com", "https://example.com", false},
+		{"secure requires base url", true, "", "", "https://example.com", false},
+		{"secure rejects http", true, "http://auth.example.com", "", "https://example.com", false},
+		{"secure rejects missing host", true, "https://", "", "https://example.com", false},
+		{"secure rejects bare host", true, "auth.example.com", "", "https://example.com", false},
+		{"secure accepts https", true, "https://auth.example.com", "", "https://example.com", true},
+		{"secure accepts https with a cookie domain", true, "https://auth.example.com", ".example.com", "https://example.com", true},
+		{"secure rejects an http site url", true, "https://auth.example.com", "", "http://example.com", false},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := (&Config{CookieSecure: tc.secure, BaseURL: tc.base, CookieDomain: tc.domain}).CheckServe()
+			err := (&Config{CookieSecure: tc.secure, BaseURL: tc.base, CookieDomain: tc.domain, SiteURL: tc.site}).CheckServe()
 			if (err == nil) != tc.ok {
 				t.Fatalf("CheckServe() err = %v, want ok=%v", err, tc.ok)
 			}

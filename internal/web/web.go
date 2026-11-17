@@ -35,6 +35,7 @@ func Templates(pages fs.FS) *template.Template {
 // when the request is authenticated, who is logged in (shown in the header).
 type Chrome struct {
 	Title     string
+	SiteURL   string
 	UserEmail string
 	IsAdmin   bool
 	// Nav is the active top-level section ("home", "keys", "admin") used to

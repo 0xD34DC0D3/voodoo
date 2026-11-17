@@ -49,6 +49,7 @@ func setup(t *testing.T) *testEnv {
 		DBPath:       dbPath,
 		Port:         0,
 		CookieSecure: false,
+		SiteURL:      "https://site.example",
 		SessionTTL:   24 * time.Hour,
 		// CookieSecure=false also puts OAuth resource policy into its
 		// localhost-permitting mode, which is what makes testResource valid.

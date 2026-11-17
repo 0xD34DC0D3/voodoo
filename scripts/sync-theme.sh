@@ -5,10 +5,10 @@
 # block; this copies every `--name: value;` declaration in it into a plain
 # `:root { }` block that style.css reads. Nothing else is copied.
 #
-#   usage: scripts/sync-theme.sh [path/to/website]   (default ../0xD34DC0D3/website)
+#   usage: scripts/sync-theme.sh [path/to/website]   (default ../website)
 set -eu
 
-site=${1:-../0xD34DC0D3/website}
+site=${1:-../website}
 src="$site/src/styles/global.css"
 out=internal/web/static/theme.css
 

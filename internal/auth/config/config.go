@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type Config struct {
 	BindHost string
 
 	BaseURL      string
+	SiteURL      string
 	CookieDomain string
 	CookieSecure bool
 	SessionTTL   time.Duration
@@ -81,6 +83,7 @@ func Load() (*Config, error) {
 		Port:         port,
 		BindHost:     bindHost,
 		BaseURL:      os.Getenv("VOODOO_BASE_URL"),
+		SiteURL:      strings.TrimRight(envOr("VOODOO_SITE_URL", "http://localhost:4321"), "/"),
 		CookieDomain: os.Getenv("VOODOO_COOKIE_DOMAIN"),
 		CookieSecure: cookieSecure,
 		SessionTTL:   time.Duration(sessionDays) * 24 * time.Hour,
@@ -110,6 +113,9 @@ func (c *Config) CheckServe() error {
 	u, err := url.Parse(c.BaseURL)
 	if c.BaseURL == "" || err != nil || u.Scheme != "https" || u.Host == "" {
 		return errors.New("VOODOO_BASE_URL must be an https URL when VOODOO_COOKIE_SECURE is on")
+	}
+	if u, err := url.Parse(c.SiteURL); err != nil || u.Scheme != "https" || u.Host == "" {
+		return errors.New("VOODOO_SITE_URL must be an https URL when VOODOO_COOKIE_SECURE is on")
 	}
 	return nil
 }

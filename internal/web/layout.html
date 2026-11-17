@@ -14,7 +14,11 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header>
-    <a class="brand" href="/"><span class="tile" aria-hidden="true">0x</span><span>voo<span class="dim">doo</span></span></a>
+    <div class="brand">
+      <a class="org" href="{{.SiteURL}}/" aria-label="deadcode home"><span class="tile" aria-hidden="true">0x</span></a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a class="app" href="/">voo<span class="dim">doo</span></a>
+    </div>
     {{if .UserEmail}}
     <nav aria-label="Primary">
       <a href="/" {{if eq .Nav "home"}}aria-current="page"{{end}}>home</a>
@@ -37,8 +41,8 @@
 {{define "bottom"}}
   </main>
   <footer>
-    <span><a href="https://github.com/0xD34DC0D3/voodoo" rel="noopener">voodoo</a> · deadcode auth</span>
-    <span class="hex">0xD34DC0D3</span>
+    <span><a href="{{.SiteURL}}/">deadcode</a> · <a href="{{.SiteURL}}/#apps">all apps</a></span>
+    <span><span class="hex">0xD34DC0D3</span> · <a href="https://github.com/0xD34DC0D3/voodoo" rel="noopener">voodoo</a></span>
   </footer>
 </body>
 </html>

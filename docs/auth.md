@@ -218,6 +218,7 @@ Raw SQL via `sqlite3` stays the always-works fallback for admin work.
 | `VOODOO_PORT` | `8080` | |
 | `VOODOO_BIND` | `127.0.0.1` | Interface to bind. Loopback by default since the reverse proxy is the only intended client. Set empty to listen on all interfaces. |
 | `VOODOO_BASE_URL` | — | Auth server's public URL. Used for redirects, invite and reset links, and the OAuth issuer. `serve` refuses to start unless it is an `https://` URL while `VOODOO_COOKIE_SECURE` is on. |
+| `VOODOO_SITE_URL` | `http://localhost:4321` | The deadcode website, linked from the header and footer. Must be `https://` while `VOODOO_COOKIE_SECURE` is on. |
 | `VOODOO_COOKIE_DOMAIN` | — | Parent domain in prod (e.g. `.example.com`). Leave empty in local dev — host-only cookie on `localhost` is shared across ports. `serve` refuses to start with it set while `VOODOO_COOKIE_SECURE` is off. |
 | `VOODOO_COOKIE_SECURE` | `true` | Set `false` in local dev (no HTTPS on `localhost`). |
 | `VOODOO_SESSION_TTL_DAYS` | `30` | |

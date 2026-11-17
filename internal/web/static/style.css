@@ -184,7 +184,6 @@ header {
   border-bottom: var(--b) solid var(--ink);
 }
 
-/* the website's Logo: an accent "0x" tile beside the wordmark */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -192,11 +191,20 @@ header {
   font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+.brand a {
   text-decoration: none;
 }
 
-.brand:hover {
+.brand a:hover {
   background: none;
+}
+
+.brand .sep {
+  font-family: var(--mono);
+  font-weight: 400;
+  color: var(--muted);
 }
 
 .brand .tile {

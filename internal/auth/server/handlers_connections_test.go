@@ -247,6 +247,16 @@ func TestConnectionsIsLinkedFromChrome(t *testing.T) {
 	}
 }
 
+func TestChromeLinksBackToSite(t *testing.T) {
+	e := setup(t)
+	body := e.get(t, "/login", nil).Body.String()
+	for _, href := range []string{`href="https://site.example/"`, `href="https://site.example/#apps"`} {
+		if !strings.Contains(body, href) {
+			t.Fatalf("/login is missing %s", href)
+		}
+	}
+}
+
 func TestAdminClientsIsLinkedFromAdmin(t *testing.T) {
 	e := setup(t)
 	adminCk := e.loginCookie(t)

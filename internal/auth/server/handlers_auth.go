@@ -57,10 +57,11 @@ func (s *Server) render(c echo.Context, status int, tmpl string, data any) error
 func (s *Server) pageChrome(c echo.Context, title string) web.Chrome {
 	path := c.Path()
 	ch := web.Chrome{
-		Title: title,
-		Nav:   navFor(path),
-		Wide:  wideFor(path),
-		Flash: s.takeFlash(c),
+		Title:   title,
+		Nav:     navFor(path),
+		Wide:    wideFor(path),
+		Flash:   s.takeFlash(c),
+		SiteURL: s.cfg.SiteURL,
 	}
 	if u, ok := UserFromContext(c); ok {
 		ch.UserEmail = u.Email

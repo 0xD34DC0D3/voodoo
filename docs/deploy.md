@@ -257,6 +257,7 @@ and `.env.example` (local development); [docs/auth.md](auth.md) describes each.
 Worth calling out:
 
 - `VOODOO_BASE_URL`: voodoo's public URL, e.g. `https://auth.example.com`.
+- `VOODOO_SITE_URL`: the deadcode website, e.g. `https://example.com`.
 - `VOODOO_COOKIE_DOMAIN`: the parent domain with a leading dot
   (`.example.com`) to share the session cookie with sibling apps. voodoo refuses
   to start with a cookie domain unless `VOODOO_COOKIE_SECURE=true`.
