@@ -195,6 +195,7 @@ uploads it with two repo files:
 | built binary            | `/usr/local/bin/voodoo`              | 0755 |
 | `deploy/backup.sh`      | `/usr/local/bin/voodoo-backup`       | 0755 |
 | `deploy/voodoo.service` | `/etc/systemd/system/voodoo.service` | 0644 |
+| `deploy/install.sh`     | `/usr/local/sbin/voodoo-install`     | 0755 |
 
 Edit those files in the repo, never on the server; `make deploy` overwrites
 the server copies.
@@ -249,6 +250,33 @@ systemctl reload caddy
 Reload, never restart. A failed reload leaves the running config serving, so the
 worst case is "the change didn't apply". A restart re-reads from disk, so a
 broken file takes down every site on the box until someone fixes it.
+
+### Deploying from CI
+
+Every push to `main` that passes the `test` job deploys through the `deploy`
+job in `.github/workflows/ci.yml`. CI never gets root:
+
+- It connects as user `deploy`. That user's key is `restrict`ed and forced to
+  run `sudo /usr/local/sbin/voodoo-install`, which only reads a release
+  tarball on stdin. No shell, no forwarding, no other command.
+- `voodoo-install` is installed only by `make deploy` (root), so CI can't
+  replace it.
+- The job runs in the `production` GitHub environment, which only `main` may
+  use. Pull requests, including those from forks, never see its secrets.
+- The server's host key is pinned, and the actions are pinned to commit SHAs.
+
+One-time setup (run `make deploy` once first so `voodoo-install` exists):
+
+```sh
+ssh-keygen -t ed25519 -N "" -C voodoo-ci -f ci_key
+VOODOO_HOST=root@your-server deploy/ci-setup.sh ci_key.pub
+gh secret set DEPLOY_SSH_KEY --env production < ci_key
+gh variable set DEPLOY_HOST --env production --body deploy@your-server
+gh variable set DEPLOY_KNOWN_HOSTS --env production --body "$(ssh-keyscan -t ed25519 your-server)"
+rm ci_key ci_key.pub
+```
+
+Revoke CI by deleting `/home/deploy/.ssh/authorized_keys` on the server.
 
 ## Configuration
 
