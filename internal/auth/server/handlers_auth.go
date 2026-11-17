@@ -393,12 +393,16 @@ func (s *Server) getMe(c echo.Context) error {
 	if !ok {
 		return c.NoContent(http.StatusUnauthorized)
 	}
-	return c.JSON(http.StatusOK, map[string]any{
+	me := map[string]any{
 		"id":       u.ID,
 		"email":    u.Email,
 		"is_admin": u.IsAdmin,
 		"timezone": u.Timezone,
-	})
+	}
+	if k, ok := APIKeyFromContext(c); ok {
+		me["key"] = map[string]string{"id": k.ID, "name": k.Name}
+	}
+	return c.JSON(http.StatusOK, me)
 }
 
 // startSession mints a session and hands the browser its two cookies, each with

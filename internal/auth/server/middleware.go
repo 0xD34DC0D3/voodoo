@@ -26,6 +26,7 @@ const (
 const (
 	ctxUserKey    = "user"
 	ctxSessionKey = "session_id"
+	ctxAPIKeyKey  = "api_key"
 )
 
 var errNoAuth = errors.New("no auth")
@@ -38,6 +39,19 @@ func UserFromContext(c echo.Context) (*store.User, bool) {
 	}
 	u, ok := v.(*store.User)
 	return u, ok
+}
+
+// apiKeyInfo identifies the API key a request authenticated with.
+type apiKeyInfo struct {
+	ID   string
+	Name string
+}
+
+// APIKeyFromContext returns the key id and name when the request authenticated
+// with a bearer API key; false for cookie-authenticated requests.
+func APIKeyFromContext(c echo.Context) (apiKeyInfo, bool) {
+	k, ok := c.Get(ctxAPIKeyKey).(apiKeyInfo)
+	return k, ok
 }
 
 // sessionIDFromContext returns the raw UI cookie value requireSession
@@ -129,6 +143,7 @@ func (s *Server) authenticateBearer(c echo.Context, raw string) (*store.User, er
 		LastUsedAt: sql.NullTime{Time: now, Valid: true},
 		ID:         key.ID,
 	})
+	c.Set(ctxAPIKeyKey, apiKeyInfo{ID: key.ID, Name: key.Name})
 	return &u, nil
 }
 

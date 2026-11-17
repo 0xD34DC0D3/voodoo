@@ -85,6 +85,49 @@ func TestBearerAuthMeHappyPath(t *testing.T) {
 	}
 }
 
+func TestMeIncludesKeyInfoForBearer(t *testing.T) {
+	e := setup(t)
+	adminID := e.mkAdmin(t)
+	raw, id := e.insertKey(t, adminID, sql.NullTime{})
+
+	req := httptest.NewRequest(http.MethodGet, "/me", nil)
+	req.Header.Set("Authorization", "Bearer "+raw)
+	rr := e.do(t, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("/me status=%d body=%s", rr.Code, rr.Body.String())
+	}
+	var me struct {
+		Key *struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"key"`
+	}
+	if err := json.Unmarshal(rr.Body.Bytes(), &me); err != nil {
+		t.Fatal(err)
+	}
+	if me.Key == nil || me.Key.ID != id || me.Key.Name != "test" {
+		t.Fatalf("key=%+v, want id=%s name=test", me.Key, id)
+	}
+}
+
+func TestMeOmitsKeyForCookie(t *testing.T) {
+	e := setup(t)
+	ui, parent := e.loginCookies(t)
+	for _, ck := range []*http.Cookie{ui, parent} {
+		rr := e.get(t, "/me", ck)
+		if rr.Code != http.StatusOK {
+			t.Fatalf("/me status=%d", rr.Code)
+		}
+		var me map[string]any
+		if err := json.Unmarshal(rr.Body.Bytes(), &me); err != nil {
+			t.Fatal(err)
+		}
+		if _, ok := me["key"]; ok {
+			t.Fatalf("cookie-authenticated /me has key field: %v", me)
+		}
+	}
+}
+
 func TestBearerAuthBogusToken(t *testing.T) {
 	e := setup(t)
 	e.mkAdmin(t)

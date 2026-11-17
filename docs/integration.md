@@ -31,7 +31,9 @@ curl https://auth.example.com/me -H 'Authorization: Bearer ak_…'
 ```
 
 - `200` with `{"id", "email", "is_admin", "timezone"}` (snake_case) when the
-  session or key is valid.
+  session or key is valid. Key-authenticated responses also carry
+  `"key": {"id", "name"}` (the API key's id and label); cookie-authenticated
+  responses have no `key` field.
 - `401` with no body otherwise — expired, revoked, disabled user, or missing.
 - The session cookie wins if both credentials are present. Each successful
   call touches `last_used_at` on the session or key.
