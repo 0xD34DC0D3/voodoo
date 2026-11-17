@@ -1,0 +1,66 @@
+{{template "top" .}}
+<h1>Connected apps</h1>
+
+<p class="note">
+  Apps you approved to act as you, via OAuth. Each row is one approval: the same
+  app connecting to two different addresses is two approvals, revocable separately.
+</p>
+
+{{if .Connections}}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>App</th>
+        <th>Connects to</th>
+        <th>Access</th>
+        <th>Approved</th>
+        <th>Last used</th>
+        <th>Expires</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Connections}}
+      <tr>
+        <td data-label="App">
+          {{if .ClientURI}}<a href="{{.ClientURI}}" rel="noopener noreferrer" target="_blank">{{.ClientName}}</a>
+          {{else}}{{.ClientName}}{{end}}
+          <br><code class="muted">{{.ClientID}}</code>
+        </td>
+        <td data-label="Connects to"><code>{{.Resource}}</code></td>
+        <td data-label="Access">
+          <ul class="scopes tight">{{range .Scopes}}<li>{{.}}</li>{{end}}</ul>
+        </td>
+        <td data-label="Approved" class="muted">{{.Granted}}</td>
+        <td data-label="Last used" class="muted">{{.LastUsed}}</td>
+        <td data-label="Expires" class="muted">{{.Expires}}</td>
+        <td data-label="">
+          <details class="confirm">
+            <summary>Revoke</summary>
+            <div class="confirm-pop">
+              <span>Revoke this app's access?</span>
+              <form method="post" action="/connections/revoke">
+                <input type="hidden" name="client_id" value="{{.ClientID}}">
+                <input type="hidden" name="resource" value="{{.Resource}}">
+                <button type="submit" class="danger">Yes, revoke</button>
+              </form>
+            </div>
+          </details>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<p class="footnote">
+  All times UTC. Revoking takes effect immediately and cannot be undone — the app
+  has to ask for your approval again.
+</p>
+{{else}}
+<p class="empty">
+  No connected apps. When an app sends you here to approve an OAuth connection,
+  it will show up on this page.
+</p>
+{{end}}
+{{template "bottom" .}}

@@ -1,0 +1,13 @@
+{{template "top" .}}
+<h1>Authorization error</h1>
+
+<p class="error" role="alert">{{.Desc}}</p>
+<p class="note">Error code: <code>{{.Code}}</code></p>
+
+<p>
+  Nothing was authorized. This request was stopped before voodoo would send a
+  response back to the app, because the app did not identify itself in a way that
+  could be trusted with one — so there is nowhere safe to return you to.
+</p>
+<p class="footnote">Start again from the app, or head <a href="/">home</a>.</p>
+{{template "bottom" .}}

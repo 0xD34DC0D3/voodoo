@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: gofmt
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "gofmt needed on:"; echo "$unformatted"; exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test -race ./...
+
+      - name: Install tools
+        run: |
+          go install github.com/sqlc-dev/sqlc/cmd/sqlc@$(make -s print-SQLC_VERSION)
+          go install golang.org/x/vuln/cmd/govulncheck@$(make -s print-GOVULNCHECK_VERSION)
+
+      - name: sqlc generate is up to date
+        run: |
+          make sqlc
+          if [ -n "$(git status --porcelain -- internal/auth/store)" ]; then
+            git status --short -- internal/auth/store
+            git diff -- internal/auth/store
+            echo "generated code is stale; run 'make sqlc' and commit"; exit 1
+          fi
+
+      - name: govulncheck
+        run: ./deploy/vulncheck.sh

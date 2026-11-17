@@ -1,0 +1,25 @@
+{{template "top" .}}
+<div class="auth">
+  <h1>Set a new password</h1>
+  {{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
+
+  {{if .Token}}
+  <p class="note">Choose a new password for your account. This link works only once, and updating your password signs you out everywhere else.</p>
+  <form method="post" action="/reset">
+    <input type="hidden" name="token" value="{{.Token}}">
+    <label>
+      <span>New password</span>
+      <input type="password" name="password" required minlength="15" autocomplete="new-password" autofocus>
+    </label>
+    <label>
+      <span>Confirm new password</span>
+      <input type="password" name="confirm" required minlength="15" autocomplete="new-password">
+    </label>
+    <button type="submit">Update password</button>
+  </form>
+  {{else}}
+  <p class="note">This reset link is invalid, expired, or has already been used. Ask an admin to issue a new one.</p>
+  <p class="note">Remembered it? <a href="/login">Log in</a>.</p>
+  {{end}}
+</div>
+{{template "bottom" .}}

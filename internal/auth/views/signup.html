@@ -1,0 +1,26 @@
+{{template "top" .}}
+<div class="auth">
+  <h1>Create account</h1>
+  {{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
+
+  {{if .Invite}}
+  <p class="note">You've been invited. {{if .Bound}}Pick a password for the email below.{{else}}Pick your email and password below.{{end}}</p>
+  <form method="post" action="/signup">
+    <input type="hidden" name="invite" value="{{.Invite}}">
+    {{if .Next}}<input type="hidden" name="next" value="{{.Next}}">{{end}}
+    <label>
+      <span>Email</span>
+      <input type="email" name="email" value="{{.Email}}" required autocomplete="email" {{if .Bound}}readonly{{else}}autofocus{{end}}>
+    </label>
+    <label>
+      <span>Password</span>
+      <input type="password" name="password" required minlength="15" autocomplete="new-password" {{if .Bound}}autofocus{{end}}>
+    </label>
+    <button type="submit">Create account</button>
+  </form>
+  {{else}}
+  <p class="note">Signing up requires a valid invite link. If yours expired or was already used, ask an admin to send a new one.</p>
+  <p class="note">Already have an account? <a href="/login{{if .Next}}?next={{.Next | urlquery}}{{end}}">Log in</a>.</p>
+  {{end}}
+</div>
+{{template "bottom" .}}

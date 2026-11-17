@@ -1,0 +1,78 @@
+{{template "top" .}}
+<h1>Invites</h1>
+<p class="backlink"><a href="/admin">cd ..</a> <span class="path">/admin</span></p>
+{{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
+
+{{if .NewLink}}
+<div class="secret">
+  <p class="warn">Invite created — send this link now, it will not be shown again</p>
+  <pre><code>{{.NewLink}}</code></pre>
+  <p class="hint">Click the link to select the whole value, then copy.</p>
+</div>
+{{end}}
+
+<h2>Create invite</h2>
+<form method="post" action="/admin/invites">
+  <div class="form-row">
+    <label>
+      <span>Email</span>
+      <input type="email" name="email" placeholder="blank = open link" value="{{.FormEmail}}" aria-describedby="invite-email-hint">
+    </label>
+    <label class="narrow">
+      <span>Expires in days</span>
+      <input type="number" name="expires_in_days" min="1" max="365" inputmode="numeric" value="{{.FormDays}}" required>
+    </label>
+    <button type="submit">Create invite</button>
+  </div>
+  <p class="note" id="invite-email-hint">With an email, the link signs up only that address, once. Leave blank for an open link anyone can use until it expires: treat it like a password, keep the expiry short, and delete it when done.</p>
+</form>
+
+<h2>Existing invites</h2>
+{{if .Invites}}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Token</th>
+        <th>For</th>
+        <th>Status</th>
+        <th>Signups</th>
+        <th>Expires</th>
+        <th>Created</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Invites}}
+      <tr>
+        <td data-label="Token"><code>{{.TokenPreview}}</code></td>
+        <td data-label="For">{{if .Email}}{{.Email}}{{else}}<span class="badge attn">open</span>{{end}}</td>
+        <td data-label="Status">
+          {{if or (eq .Status "pending") (eq .Status "active")}}<span class="badge attn">{{.Status}}</span>
+          {{else if eq .Status "expired"}}<span class="badge bad">expired</span>
+          {{else}}<span class="badge off">{{.Status}}</span>{{end}}
+        </td>
+        <td data-label="Signups">{{if .Email}}{{if .SignupEmails}}used by {{.SignupEmails}}{{else}}<span class="muted">unused</span>{{end}}{{else}}{{.Signups}} signup{{if ne .Signups 1}}s{{end}}{{if .SignupEmails}}<br><span class="muted">{{.SignupEmails}}</span>{{end}}{{end}}</td>
+        <td data-label="Expires" class="muted">{{.Expires}}</td>
+        <td data-label="Created" class="muted">{{.Created}}</td>
+        <td data-label="">
+          <details class="confirm">
+            <summary>Delete</summary>
+            <div class="confirm-pop">
+              <span>Delete this invite?</span>
+              <form method="post" action="/admin/invites/{{.Token}}/delete">
+                <button type="submit" class="danger">Yes, delete</button>
+              </form>
+            </div>
+          </details>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<p class="footnote">All times UTC. Deleting an invite revokes its link (open links included) and drops its signup record; the accounts stay.</p>
+{{else}}
+<p class="empty">No invites yet — create one above to onboard someone.</p>
+{{end}}
+{{template "bottom" .}}

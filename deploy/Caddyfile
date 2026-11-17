@@ -1,0 +1,26 @@
+# Caddy terminates TLS and proxies to voodoo on localhost.
+# auth.example.com is a placeholder: use your voodoo host.
+# Once the host's DNS record points straight at this server (not through a
+# CDN proxy), Caddy obtains and renews a Let's Encrypt certificate on its own.
+#
+# This is voodoo's site block only. If /etc/caddy/Caddyfile also serves other
+# sites, add or edit this block in place rather than copying the file over it.
+# After any change:
+#
+#   cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak
+#   caddy validate --config /etc/caddy/Caddyfile
+#   systemctl reload caddy
+#
+# Reload, never restart: a failed reload keeps the running config serving, a
+# restart with a broken file takes every site on the box down.
+auth.example.com {
+	encode gzip
+
+	# This host is the login surface for every federated site and its cookie is
+	# scoped to the parent domain, so no plaintext requests, ever. No "preload":
+	# that is an apex-domain commitment and effectively irreversible.
+	# includeSubDomains only covers names under auth.example.com.
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+	reverse_proxy 127.0.0.1:8080
+}

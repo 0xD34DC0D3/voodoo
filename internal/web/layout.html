@@ -1,0 +1,40 @@
+{{define "top"}}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · voodoo</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/static/fonts/atkinson-hyperlegible-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header>
+    <a class="brand" href="/">voodoo:~$ <span class="cursor" aria-hidden="true">▌</span></a>
+    {{if .UserEmail}}
+    <nav aria-label="Primary">
+      <a href="/" {{if eq .Nav "home"}}aria-current="page"{{end}}>home</a>
+      <a href="/keys" {{if eq .Nav "keys"}}aria-current="page"{{end}}>keys</a>
+      <a href="/connections" {{if eq .Nav "connections"}}aria-current="page"{{end}}>apps</a>
+      {{if .IsAdmin}}<a href="/admin" {{if eq .Nav "admin"}}aria-current="page"{{end}}>admin</a>{{end}}
+    </nav>
+    <div class="who">
+      <span>{{.UserEmail}}</span>
+      <form method="post" action="/logout">
+        <button class="ghost" type="submit">log out</button>
+      </form>
+    </div>
+    {{end}}
+  </header>
+  <main id="main"{{if .Wide}} class="wide"{{end}}>
+    {{if .Flash}}<p class="flash" role="status">{{.Flash}}</p>{{end}}
+{{end}}
+
+{{define "bottom"}}
+  </main>
+  <footer>·· <a href="https://github.com/0xD34DC0D3/voodoo" rel="noopener"><em>voodoo</em></a> ··</footer>
+</body>
+</html>
+{{end}}

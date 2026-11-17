@@ -1,0 +1,54 @@
+{{template "top" .}}
+<h1>Home</h1>
+
+<div class="panel">
+  <p class="status"><span class="caption">// session</span> <span class="badge attn">authenticated</span></p>
+  <dl class="kv">
+    <div class="row"><dt>Email</dt><span class="lead" aria-hidden="true"></span><dd>{{.UserEmail}}</dd></div>
+    <div class="row"><dt>Role</dt><span class="lead" aria-hidden="true"></span><dd>{{if .IsAdmin}}admin{{else}}user{{end}}</dd></div>
+    <div class="row"><dt>Member since</dt><span class="lead" aria-hidden="true"></span><dd>{{.Created}} UTC</dd></div>
+  </dl>
+</div>
+
+<h2>Settings</h2>
+{{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
+<form method="post" action="/settings/timezone">
+  <div class="form-row">
+    <label class="narrow">
+      <span>Timezone</span>
+      <select name="timezone">
+        {{$current := .Timezone}}
+        {{range .Timezones}}
+        <option value="{{.}}"{{if eq . $current}} selected{{end}}>{{.}}</option>
+        {{end}}
+      </select>
+    </label>
+    <button type="submit">Save</button>
+  </div>
+</form>
+
+<ul class="cards">
+  <li>
+    <a href="/keys">
+      <strong>API keys</strong>
+      <span>Create and manage keys for CLI access.</span>
+    </a>
+  </li>
+  <li>
+    <a href="/connections">
+      <strong>Connected apps</strong>
+      <span>Review and revoke apps you authorized via OAuth.</span>
+    </a>
+  </li>
+  {{if .IsAdmin}}
+  <li>
+    <a href="/admin">
+      <strong>Admin</strong>
+      <span>Manage users and invites.</span>
+    </a>
+  </li>
+  {{end}}
+</ul>
+
+<p class="note">From the CLI, send <code>Authorization: Bearer &lt;key&gt;</code> — <code>GET /me</code> returns your identity as JSON.</p>
+{{template "bottom" .}}

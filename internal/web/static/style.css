@@ -1,0 +1,942 @@
+/* voodoo — terminal-amber theme */
+
+/* ---------------------------------------------------------------- fonts */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Mono";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/static/fonts/atkinson-hyperlegible-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Mono";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/static/fonts/atkinson-hyperlegible-mono-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+/* ----------------------------------------------------------------- base */
+
+:root {
+  --bg: #16130e;
+  --ink: #e8decb;
+  /* --dim was #9b8f76 (~4.3:1 on --bg) which fails WCAG AA for the small
+     text it's used on. Nudged lighter to clear 4.5:1 without losing the
+     muted feel. --faint keeps the older, dimmer tone for purely decorative
+     chrome (footer, leader dots) where contrast isn't load-bearing. */
+  --dim: #b3a589;
+  --faint: #877c66;
+  --line: #3b3327;
+  --amber: #ffb000;
+  --red: #e8694a;
+  --mono: "Atkinson Hyperlegible Mono", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, "Liberation Mono", monospace;
+
+  /* vertical rhythm — one scale, used everywhere so margins share a grid */
+  --s1: 0.5rem;
+  --s2: 0.75rem;
+  --s3: 1rem;
+  --s4: 1.5rem;
+  --s5: 2.5rem;
+  --s6: 3.5rem;
+
+  /* faint amber washes for zebra rows / textures, kept in one place */
+  --wash: rgba(255, 176, 0, 0.04);
+  --wash-soft: rgba(255, 176, 0, 0.022);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 var(--mono);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+::selection {
+  background: var(--amber);
+  color: var(--bg);
+}
+
+a {
+  color: var(--amber);
+  text-decoration: none;
+}
+
+a:hover {
+  background: var(--amber);
+  color: var(--bg);
+}
+
+a,
+button,
+.cards a,
+a.btn,
+tbody tr,
+summary {
+  transition: background 90ms linear, color 90ms linear,
+    border-color 90ms linear, transform 90ms linear;
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 1px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* skip link — first focusable element, hidden until focused */
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip:focus {
+  left: 0;
+  top: 0;
+  z-index: 20;
+  background: var(--amber);
+  color: var(--bg);
+  padding: 0.5rem 0.9rem;
+}
+
+/* --------------------------------------------------------------- chrome */
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+header nav {
+  display: flex;
+  gap: 1.25rem;
+}
+
+header nav a[aria-current="page"] {
+  color: var(--amber);
+  border-bottom: 1px solid var(--amber);
+}
+
+/* the brand reads as a shell prompt and carries the one live (blinking)
+   caret on the page */
+.brand {
+  color: var(--amber);
+  letter-spacing: 0.04em;
+}
+
+.brand:hover {
+  background: var(--amber);
+  color: var(--bg);
+}
+
+.brand:hover .cursor {
+  color: var(--bg);
+}
+
+.cursor {
+  color: var(--amber);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cursor {
+    animation: blink 1.2s steps(1) infinite;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.who {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--dim);
+  font-size: 0.85rem;
+}
+
+/* a long email must never blow out the header bar on narrow screens */
+.who span {
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main {
+  /* grow to push the footer down, but DON'T justify content into the void:
+     content sits at a deliberate top offset rather than a centered block
+     floating in an empty viewport. */
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--s6) 1.5rem var(--s5);
+}
+
+/* table-heavy pages opt into a wider measure */
+main.wide {
+  max-width: 960px;
+}
+
+footer {
+  padding: 0.6rem 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--faint);
+  font-size: 0.75rem;
+  text-align: center;
+  letter-spacing: 0.2em;
+}
+
+/* ----------------------------------------------------------- typography */
+
+h1 {
+  font-size: 1.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 var(--s5);
+}
+
+h1::before {
+  content: "> ";
+  color: var(--amber);
+}
+
+/* h1 gets the bright amber "> " (a command — you are here); h2 gets a dim
+   "## " (a section comment). A small glyph hierarchy, not just a rule. */
+h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  margin: var(--s5) 0 var(--s3);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.4rem;
+}
+
+h2::before {
+  content: "## ";
+  color: var(--line);
+}
+
+p {
+  margin: 0 0 var(--s3);
+}
+
+code {
+  color: var(--amber);
+}
+
+.muted {
+  color: var(--dim);
+}
+
+.note {
+  color: var(--dim);
+  font-size: 0.8rem;
+}
+
+/* a note that closes out a table or list */
+.footnote {
+  color: var(--dim);
+  font-size: 0.8rem;
+  margin-top: var(--s2);
+}
+
+/* a shell-style back link: "cd .." with the path it returns to */
+.backlink {
+  font-size: 0.8rem;
+  margin-bottom: var(--s4);
+}
+
+.backlink .path {
+  color: var(--faint);
+}
+
+/* ---------------------------------------------------------------- forms */
+
+label {
+  display: block;
+  margin-bottom: 1.1rem;
+}
+
+label span {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  margin-bottom: 0.35rem;
+}
+
+input:not([type="checkbox"]):not([type="radio"]) {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  border-radius: 0;
+}
+
+input[readonly] {
+  color: var(--dim);
+  border-style: dashed;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--amber);
+  /* a faint inner glow so an active terminal field is unmistakable */
+  box-shadow: inset 0 0 0 1px rgba(255, 176, 0, 0.25);
+}
+
+/* a label whose control is a checkbox: keep the box at its natural size and
+   sit it on its own line under the caption */
+label.checkbox input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--amber);
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.25rem;
+}
+
+.form-row label {
+  flex: 1 1 14rem;
+  margin: 0;
+}
+
+.form-row .narrow {
+  flex: 0 1 14rem;
+}
+
+/* -------------------------------------------------------------- buttons */
+
+button {
+  font: inherit;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--amber);
+  border: 1px solid var(--amber);
+  color: var(--bg);
+  padding: 0.55rem 1.2rem;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+button:hover {
+  background: transparent;
+  color: var(--amber);
+}
+
+/* a click should feel physical */
+button:active {
+  transform: translateY(1px);
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--dim);
+  border-color: var(--line);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.72rem;
+}
+
+button.ghost:hover {
+  color: var(--ink);
+  border-color: var(--dim);
+}
+
+button.danger {
+  background: transparent;
+  color: var(--red);
+  border-color: var(--red);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.72rem;
+}
+
+button.danger:hover {
+  background: var(--red);
+  color: var(--bg);
+}
+
+.actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.actions form {
+  display: inline;
+  margin: 0;
+}
+
+/* a link that needs to read as a button alongside real buttons (e.g. the
+   "edit" action sitting next to ghost/danger buttons in a row) */
+a.btn {
+  display: inline-block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  border: 1px solid var(--line);
+  padding: 0.3rem 0.7rem;
+}
+
+a.btn:hover {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--dim);
+}
+
+/* ------------------------------------------------------ inline confirm */
+
+/* A JS-free, two-step confirm for irreversible actions. The <summary> is the
+   trigger styled like a button; opening the <details> reveals the real submit
+   inline. Keyboard-accessible for free, and the form still works without CSS. */
+.confirm {
+  display: inline-block;
+  position: relative;
+}
+
+.confirm > summary {
+  list-style: none;
+  display: inline-block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--red);
+  color: var(--red);
+  cursor: pointer;
+  user-select: none;
+}
+
+.confirm > summary::-webkit-details-marker {
+  display: none;
+}
+
+.confirm[open] > summary {
+  background: var(--red);
+  color: var(--bg);
+}
+
+.confirm.neutral > summary {
+  border-color: var(--line);
+  color: var(--dim);
+}
+
+.confirm.neutral[open] > summary {
+  background: var(--line);
+  color: var(--ink);
+}
+
+.confirm-pop {
+  position: absolute;
+  z-index: 10;
+  right: 0;
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* cap the width and let the prompt text wrap: a long email in the message
+     must not stretch the popover off the column edge and clip the button */
+  width: max-content;
+  max-width: min(20rem, 80vw);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--amber);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--dim);
+}
+
+.confirm-pop > span {
+  overflow-wrap: anywhere;
+}
+
+.confirm-pop form {
+  display: inline;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------- tables */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+th {
+  text-align: left;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  border-bottom: 1px solid var(--dim);
+  padding: 0.5rem 0.6rem;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  /* sit above hovered-row backgrounds and the amber first-cell tick so the
+     header text stays readable as rows scroll under it */
+  z-index: 1;
+  background: var(--bg);
+}
+
+td {
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+/* dates/times read as data — align them on a tabular grid */
+td.muted {
+  font-variant-numeric: tabular-nums;
+}
+
+td code {
+  font-size: 0.82rem;
+}
+
+/* faintest zebra wash — like alternating terminal lines */
+tbody tr:nth-child(even) td {
+  background: var(--wash-soft);
+}
+
+/* row hover: a brighter wash plus an amber tick on the first cell, like a
+   cursor selecting the line */
+tbody tr:hover td {
+  background: var(--wash);
+}
+
+tbody tr:hover td:first-child {
+  box-shadow: inset 2px 0 0 var(--amber);
+}
+
+/* In dense lists a full amber hover block on a long title is a lot of flashing
+   as the cursor moves — underline the link instead, reserve the block for
+   short interactive links elsewhere. */
+td a:not(.btn):hover {
+  background: none;
+  color: var(--amber);
+  text-decoration: underline;
+}
+
+/* ----------------------------------------------------------- components */
+
+.badge {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid;
+  padding: 0.05rem 0.4rem;
+  white-space: nowrap;
+}
+
+.badge.attn {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.badge.off {
+  color: var(--dim);
+  border-color: var(--line);
+}
+
+.badge.bad {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.error {
+  border: 1px solid var(--red);
+  color: var(--red);
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.error::before {
+  content: "! ";
+  font-weight: 700;
+}
+
+/* one-shot success notice after a redirect — amber sibling of .error */
+.flash {
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.flash::before {
+  content: "\2713  ";
+  font-weight: 700;
+}
+
+/* a framed block of "output" — amber top edge anchors it to the page */
+.panel {
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--amber);
+  padding: 1.25rem 1.4rem;
+  margin-bottom: var(--s5);
+}
+
+.panel .status {
+  margin: 0 0 0.9rem;
+}
+
+.panel .caption {
+  color: var(--dim);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-right: 0.6rem;
+}
+
+/* key/value rows rendered like aligned config output: LABEL ···· value */
+.kv {
+  margin: 0;
+}
+
+.kv .row {
+  display: flex;
+  align-items: baseline;
+  gap: 0 0.6ch;
+  padding: 0.15rem 0;
+}
+
+.kv dt {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  margin: 0;
+}
+
+.kv .lead {
+  flex: 1 1 auto;
+  align-self: stretch;
+  border-bottom: 1px dotted var(--line);
+  transform: translateY(-0.3em);
+  min-width: 1.5rem;
+}
+
+.kv dd {
+  flex: 0 1 auto;
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* one-time reveal of a freshly created secret (API key, invite link) — the
+   loudest moment in the app, so give it the strongest amber treatment */
+.secret {
+  border: 1px solid var(--amber);
+  border-left-width: 3px;
+  padding: 1.2rem;
+  margin: var(--s4) 0;
+}
+
+.secret .warn {
+  color: var(--amber);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  margin: 0 0 0.75rem;
+}
+
+/* the copyable target reads as "hot": amber dashed border, faint wash, and a
+   click selects the whole value (the JS-free copy affordance) */
+.secret pre {
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px dashed var(--amber);
+  background: var(--wash);
+  overflow-x: auto;
+  cursor: pointer;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+.secret .hint {
+  color: var(--dim);
+  font-size: 0.8rem;
+  margin: 0.75rem 0 0;
+}
+
+/* a terminal "no output" line, left-aligned with a dim glyph */
+.empty {
+  color: var(--dim);
+  border: 1px dashed var(--line);
+  border-left: 2px solid var(--line);
+  padding: 1.1rem 1.25rem;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.empty::before {
+  content: "— ";
+  color: var(--faint);
+}
+
+.cards {
+  list-style: none;
+  margin: 0 0 var(--s5);
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.cards a {
+  position: relative;
+  display: block;
+  border: 1px solid var(--line);
+  padding: 1rem 1.25rem;
+  color: var(--ink);
+}
+
+.cards a:hover {
+  background: none;
+  border-color: var(--amber);
+}
+
+.cards a:hover strong {
+  color: var(--amber);
+}
+
+.cards strong {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.cards strong::before {
+  content: "› ";
+  color: var(--amber);
+}
+
+.cards span {
+  color: var(--dim);
+  font-size: 0.82rem;
+}
+
+/* an arrow that slides on hover — reads as "enter this" */
+.cards a::after {
+  content: "→";
+  position: absolute;
+  right: 1.25rem;
+  top: 1rem;
+  color: var(--line);
+}
+
+.cards a:hover::after {
+  color: var(--amber);
+  transform: translateX(3px);
+}
+
+/* ---------------------------------------------------------- auth screens */
+
+.auth {
+  max-width: 400px;
+  margin: 8vh auto 0;
+}
+
+.auth button[type="submit"] {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.auth .note {
+  margin-top: 1.5rem;
+}
+
+/* ---------------------------------------------------------- form controls */
+
+select,
+textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  border-radius: 0;
+}
+
+/* --------------------------------------------------- oauth: consent + apps */
+
+/* The consent screen is a decision, not a report, so it is boxed as one
+   self-contained thing the user acts on. Amber on the leading edge only —
+   .secret owns the full-amber treatment, and this must not outshout it. */
+.consent {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--amber);
+  padding: 1.2rem;
+  margin: var(--s4) 0;
+}
+
+.consent-lede {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+/* Scoped to .consent so it cannot disturb .secret .warn, which is the
+   uppercase-label variant. This one is a full sentence and needs the room. */
+.consent .warn {
+  color: var(--amber);
+  border: 1px dashed var(--amber);
+  padding: 0.8rem 0.9rem;
+  font-size: 0.82rem;
+  margin: var(--s3) 0;
+}
+
+/* What an app is being granted, as a checklist rather than prose — the point is
+   that it is scannable before clicking Approve. */
+.scopes {
+  list-style: none;
+  padding-left: 0;
+  margin: var(--s2) 0;
+}
+
+.scopes li {
+  border-left: 2px solid var(--line);
+  padding: 0.35rem 0 0.35rem 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+/* the same list inside a table cell, where it has to stay compact */
+.scopes.tight {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.scopes.tight li {
+  border-left: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* registered redirect URIs in the admin clients table */
+.uris {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.uris li + li {
+  margin-top: 0.25rem;
+}
+
+/* ------------------------------------------------------------- responsive */
+
+/* On phones the multi-column tables would scroll off-screen (and hide the
+   action buttons). Collapse each row into a stacked card, labelling cells
+   from their header text via data-label. */
+@media (max-width: 600px) {
+  main {
+    padding: var(--s5) 1rem var(--s4);
+  }
+
+  .table-wrap table,
+  .table-wrap thead,
+  .table-wrap tbody,
+  .table-wrap tr,
+  .table-wrap td {
+    display: block;
+    width: 100%;
+  }
+
+  .table-wrap thead {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .table-wrap tr {
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--amber);
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .table-wrap td {
+    border: none;
+    padding: 0.25rem 0;
+  }
+
+  tbody tr:nth-child(even) td,
+  tbody tr:hover td {
+    background: none;
+  }
+
+  tbody tr:hover td:first-child {
+    box-shadow: none;
+  }
+
+  .table-wrap td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+  }
+
+  /* cells with no header (the actions column) shouldn't print an empty label */
+  .table-wrap td[data-label=""]::before {
+    display: none;
+  }
+
+  .confirm-pop {
+    right: auto;
+    left: 0;
+  }
+}

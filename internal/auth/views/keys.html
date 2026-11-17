@@ -1,0 +1,63 @@
+{{template "top" .}}
+<h1>API keys</h1>
+{{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
+
+<h2>Create a new key</h2>
+<form method="post" action="/keys">
+  <div class="form-row">
+    <label>
+      <span>Name</span>
+      <input type="text" name="name" required maxlength="100" placeholder="e.g. laptop CLI" value="{{.Name}}" autofocus>
+    </label>
+    <label class="narrow">
+      <span>Expires in days</span>
+      <input type="number" name="expires_in_days" min="1" max="3650" inputmode="numeric" placeholder="never" value="{{.Days}}">
+    </label>
+    <button type="submit">Create key</button>
+  </div>
+  <p class="note">Leave expiry blank for a key that never expires (1–3650 days otherwise).</p>
+</form>
+
+<h2>Your keys</h2>
+{{if .Keys}}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Prefix</th>
+        <th>Created</th>
+        <th>Last used</th>
+        <th>Expires</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Keys}}
+      <tr>
+        <td data-label="Name">{{.Name}}</td>
+        <td data-label="Prefix"><code>{{.Prefix}}…</code></td>
+        <td data-label="Created" class="muted">{{.Created}}</td>
+        <td data-label="Last used" class="muted">{{.LastUsed}}</td>
+        <td data-label="Expires" class="muted">{{.Expires}}</td>
+        <td data-label="">
+          <details class="confirm">
+            <summary>Delete</summary>
+            <div class="confirm-pop">
+              <span>Revoke this key?</span>
+              <form method="post" action="/keys/{{.ID}}/delete">
+                <button type="submit" class="danger">Yes, delete</button>
+              </form>
+            </div>
+          </details>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<p class="footnote">All times UTC. Deleting a key revokes it immediately.</p>
+{{else}}
+<p class="empty">No keys yet — create one above to use voodoo from the CLI.</p>
+{{end}}
+{{template "bottom" .}}

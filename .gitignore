@@ -1,0 +1,38 @@
+# Build artifacts
+/bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test / coverage
+*.test
+*.out
+coverage.*
+
+# SQLite
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Local config
+.env
+.env.*
+!.env.example
+
+# Backups and keys (age-encrypted dumps, private keys)
+*.age
+*.key
+*.gz
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+.claude/
+
+# Frontend
+node_modules/
+/web/

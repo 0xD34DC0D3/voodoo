@@ -1,0 +1,24 @@
+# Keep internal/auth/store/queries.sql strictly ASCII, comments included.
+#
+# sqlc's SQLite frontend is ANTLR-based: it reports statement and token offsets as
+# *rune* indices, then slices the query file by *byte* offsets when it rewrites
+# `SELECT *` into an explicit column list. One multi-byte character anywhere in the
+# file (an em dash in a comment is enough) desynchronises the two by the difference,
+# and every later star expansion is spliced in at the wrong offset. The failure is
+# reported as "edited query syntax is invalid" against an innocent query far from the
+# real cause, so it is very hard to trace back. ASCII-only sidesteps it entirely.
+#
+# Migration files are exempt: they are only walked to build the catalog and are
+# never rewritten, so non-ASCII prose in migrations/*.sql is safe.
+version: "2"
+sql:
+  - engine: "sqlite"
+    schema: "migrations"
+    queries: "internal/auth/store/queries.sql"
+    gen:
+      go:
+        package: "store"
+        out: "internal/auth/store"
+        sql_package: "database/sql"
+        emit_empty_slices: true
+        omit_unused_structs: true

@@ -1,0 +1,58 @@
+[Unit]
+Description=Voodoo
+Documentation=https://github.com/0xD34DC0D3/voodoo
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=voodoo
+Group=voodoo
+EnvironmentFile=/etc/voodoo/voodoo.env
+ExecStart=/usr/local/bin/voodoo serve
+Restart=on-failure
+RestartSec=2s
+
+# The DB lives here; everything else is read-only to the service.
+StateDirectory=voodoo
+ReadWritePaths=/var/lib/voodoo
+
+# Bearer secrets (sessions, invites, resets, API keys, OAuth tokens) are stored
+# as digests, but the DB still holds password hashes and a map of every grant,
+# so it stays private. systemd's defaults would create the state directory 0755
+# and the database (plus -wal/-shm) 0644, readable by the other service
+# accounts on this box. Setting these here rather than by hand matters:
+# StateDirectory= re-applies StateDirectoryMode on every start, so a manual
+# chmod gets reverted.
+UMask=0077
+StateDirectoryMode=0700
+
+# Hardening — voodoo is a single static binary that only needs to listen on a
+# port and write its SQLite file. Lock down the rest.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+# Blast-radius reduction for code execution inside this process. It accepts
+# TCP from Caddy on loopback, opens nothing outbound, and needs AF_UNIX only
+# for journald. No raw/packet/netlink sockets.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+# Hide other processes from voodoo's /proc (does not hide voodoo from others).
+ProtectProc=invisible
+# ProtectClock also matters for correctness: a clock moved backwards would
+# un-expire sessions and tokens.
+ProtectKernelLogs=true
+ProtectClock=true
+ProtectHostname=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target

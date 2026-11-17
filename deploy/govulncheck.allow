@@ -1,0 +1,4 @@
+# govulncheck findings accepted for now, one per line: ID, then the reason.
+# Remove a line as soon as a fixed release exists; upgrade instead.
+GO-2026-6875  echo reverse-proxy middleware forwards X-Real-IP; voodoo does not use the proxy middleware. No fix released.
+GO-2026-6872  echo rate limiter default keys on spoofable XFF; every voodoo limiter sets IdentifierExtractor to limiterKey(c.RealIP()) with an IPExtractor that trusts XFF only from loopback. No fix released.

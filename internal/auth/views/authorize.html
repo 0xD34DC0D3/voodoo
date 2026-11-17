@@ -1,0 +1,53 @@
+{{template "top" .}}
+<h1>Authorize access</h1>
+
+<div class="consent">
+  <p class="consent-lede">
+    <strong>{{.ClientName}}</strong> is asking to connect to
+    <code>{{.Resource}}</code> as <strong>{{.UserEmail}}</strong>.
+  </p>
+
+  {{if .ClientURI}}
+  <p class="note">Homepage (self-reported, unverified): <a href="{{.ClientURI}}" rel="noopener noreferrer" target="_blank">{{.ClientURI}}</a></p>
+  {{end}}
+
+  <h2>It will be able to</h2>
+  <ul class="scopes">
+    {{range .Scopes}}<li>{{.}}</li>{{end}}
+  </ul>
+
+  <h2>Approving will send your access to</h2>
+  <p class="destination">
+    <strong>{{.RedirectHost}}</strong>
+    <br><code>{{.RedirectURI}}</code>
+  </p>
+
+  <p class="warn" role="note">
+    Anyone can register an app with this server, so the name and homepage above are
+    <em>self-reported</em> — it is not vouched for by voodoo. The host that
+    receives your access is the one line here that an attacker cannot dress up:
+    if you do not recognise it, deny this.
+  </p>
+
+  <form method="post" action="/authorize">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <input type="hidden" name="client_id" value="{{.ClientID}}">
+    <input type="hidden" name="redirect_uri" value="{{.RedirectURI}}">
+    <input type="hidden" name="state" value="{{.State}}">
+    <input type="hidden" name="scope" value="{{.Scope}}">
+    <input type="hidden" name="resource" value="{{.Resource}}">
+    <input type="hidden" name="code_challenge" value="{{.Challenge}}">
+    <input type="hidden" name="code_challenge_method" value="S256">
+    <input type="hidden" name="response_type" value="code">
+    <div class="form-row">
+      <button type="submit" name="decision" value="approve">Approve</button>
+      <button type="submit" name="decision" value="deny" class="ghost">Deny</button>
+    </div>
+  </form>
+
+  <p class="footnote">
+    This approval lasts {{.Expiry}} and can be withdrawn at any time from
+    <a href="/connections">connected apps</a>.
+  </p>
+</div>
+{{template "bottom" .}}

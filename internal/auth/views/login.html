@@ -1,0 +1,21 @@
+{{template "top" .}}
+<div class="auth">
+  <h1>Log in</h1>
+  {{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
+
+  <form method="post" action="/login">
+    {{if .Next}}<input type="hidden" name="next" value="{{.Next}}">{{end}}
+    <label>
+      <span>Email</span>
+      <input type="email" name="email" value="{{.Email}}" required autocomplete="email" autofocus>
+    </label>
+    <label>
+      <span>Password</span>
+      <input type="password" name="password" required autocomplete="current-password">
+    </label>
+    <button type="submit">Log in</button>
+  </form>
+
+  <p class="note">Accounts are invite-only. Ask an admin for an invite link if you need one.</p>
+</div>
+{{template "bottom" .}}

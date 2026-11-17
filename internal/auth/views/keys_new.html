@@ -1,0 +1,14 @@
+{{template "top" .}}
+<h1>Key created: {{.Name}}</h1>
+
+<div class="secret">
+  <p class="warn">Save this now — it will not be shown again</p>
+  <pre><code id="key-value">{{.Raw}}</code></pre>
+  <p><button type="button" class="ghost" id="copy-key" hidden>Copy</button></p>
+  <p class="hint">Use the Copy button, or click the key to select the whole value and copy. Use it as <code>Authorization: Bearer &lt;key&gt;</code>.</p>
+</div>
+
+<p class="backlink"><a href="/keys">cd ..</a> <span class="path">/keys</span></p>
+
+<script src="/static/copy-key.js" defer></script>
+{{template "bottom" .}}

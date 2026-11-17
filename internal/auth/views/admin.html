@@ -1,0 +1,24 @@
+{{template "top" .}}
+<h1>Admin</h1>
+
+<ul class="cards">
+  <li>
+    <a href="/admin/users">
+      <strong>Users</strong>
+      <span>Promote, demote, disable accounts, and revoke sessions.</span>
+    </a>
+  </li>
+  <li>
+    <a href="/admin/invites">
+      <strong>Invites</strong>
+      <span>Create and manage one-time signup links.</span>
+    </a>
+  </li>
+  <li>
+    <a href="/admin/clients">
+      <strong>OAuth clients</strong>
+      <span>Review self-registered apps and revoke their tokens.</span>
+    </a>
+  </li>
+</ul>
+{{template "bottom" .}}

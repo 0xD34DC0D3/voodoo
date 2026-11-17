@@ -1,0 +1,88 @@
+{{template "top" .}}
+<h1>Users</h1>
+<p class="backlink"><a href="/admin">cd ..</a> <span class="path">/admin</span></p>
+{{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
+
+{{if .ResetLink}}
+<div class="secret">
+  <p class="warn">Password reset link for {{.ResetEmail}} — send it now, it will not be shown again</p>
+  <pre><code>{{.ResetLink}}</code></pre>
+  <p class="hint">Expires in 1 hour and works only once. Anyone with the link can set this account's password, so share it privately.</p>
+</div>
+{{end}}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Users}}
+      <tr>
+        <td data-label="Email">{{.Email}}{{if .IsSelf}} <span class="badge attn">you</span>{{end}}</td>
+        <td data-label="Role">{{if .IsAdmin}}<span class="badge attn">admin</span>{{else}}<span class="muted">user</span>{{end}}</td>
+        <td data-label="Status">{{if .Disabled}}<span class="badge bad">disabled</span>{{else}}active{{end}}</td>
+        <td data-label="Created" class="muted">{{.Created}}</td>
+        <td data-label="">
+          {{if .IsSelf}}
+          <span class="muted">—</span>
+          {{else}}
+          <div class="actions">
+            {{if not .Disabled}}
+            <details class="confirm">
+              <summary>Disable</summary>
+              <div class="confirm-pop">
+                <span>Disable {{.Email}}? Revokes their sessions and API keys.</span>
+                <form method="post" action="/admin/users/{{.ID}}/disable">
+                  <button type="submit" class="danger">Yes, disable</button>
+                </form>
+              </div>
+            </details>
+            {{else}}
+            <form method="post" action="/admin/users/{{.ID}}/enable">
+              <button type="submit" class="ghost">Enable</button>
+            </form>
+            {{end}}
+            <details class="confirm neutral">
+              <summary>Revoke sessions</summary>
+              <div class="confirm-pop">
+                <span>Sign {{.Email}} out everywhere? Also deletes their API keys.</span>
+                <form method="post" action="/admin/users/{{.ID}}/sessions/revoke">
+                  <button type="submit" class="ghost">Yes, revoke</button>
+                </form>
+              </div>
+            </details>
+            {{if .IsAdmin}}
+            <details class="confirm neutral">
+              <summary>Demote</summary>
+              <div class="confirm-pop">
+                <span>Demote {{.Email}} to user?</span>
+                <form method="post" action="/admin/users/{{.ID}}/demote">
+                  <button type="submit" class="ghost">Yes, demote</button>
+                </form>
+              </div>
+            </details>
+            {{else}}
+            <form method="post" action="/admin/users/{{.ID}}/promote">
+              <button type="submit" class="ghost">Promote</button>
+            </form>
+            {{end}}
+            <form method="post" action="/admin/users/{{.ID}}/reset">
+              <button type="submit" class="ghost">Reset password</button>
+            </form>
+          </div>
+          {{end}}
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<p class="footnote">All times UTC. Disable, revoke and a completed password reset all delete the user's sessions, API keys and connected apps.</p>
+{{template "bottom" .}}

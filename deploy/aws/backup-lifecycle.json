@@ -1,0 +1,18 @@
+{
+  "Rules": [
+    {
+      "ID": "expire-voodoo-backups",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "voodoo/" },
+      "Expiration": { "Days": 30 },
+      "NoncurrentVersionExpiration": { "NoncurrentDays": 30 },
+      "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+    },
+    {
+      "ID": "clean-expired-delete-markers",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "voodoo/" },
+      "Expiration": { "ExpiredObjectDeleteMarker": true }
+    }
+  ]
+}
