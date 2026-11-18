@@ -14,7 +14,9 @@ cd "$(dirname "$0")/.."
 
 HOST="${VOODOO_HOST:?set VOODOO_HOST=user@host}"
 SSH_OPTS=()
-if [[ -n "${VOODOO_SSH_KEY:-}" ]]; then SSH_OPTS=(-i "$VOODOO_SSH_KEY"); fi
+# IdentitiesOnly: otherwise ssh offers agent keys first and the server can
+# refuse with "too many authentication failures" before reaching this one.
+if [[ -n "${VOODOO_SSH_KEY:-}" ]]; then SSH_OPTS=(-i "$VOODOO_SSH_KEY" -o IdentitiesOnly=yes); fi
 
 echo ">> gate: clean tree"
 if [[ -n "$(git status --porcelain)" ]]; then
