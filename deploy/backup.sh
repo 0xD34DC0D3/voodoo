@@ -50,9 +50,26 @@ else
 fi
 HC_URL="${VOODOO_BACKUP_HEALTHCHECK_URL:-}"
 
+# The deploy runs this with its output in a public CI log, and age, aws and
+# curl errors can name the bucket, key or healthcheck URL. quiet runs a
+# command, sends its stderr to the journal (journalctl -t voodoo-backup) on
+# failure, prints only a generic line, and keeps the command's exit status.
+quiet() {
+  local what="$1" errf rc=0
+  shift
+  errf="$(mktemp)"
+  "$@" 2>"$errf" || rc=$?
+  if (( rc != 0 )); then
+    logger -t voodoo-backup -p user.err -- "$what failed (exit $rc): $(head -c 4000 "$errf")" 2>/dev/null || true
+    echo "$what failed; details: journalctl -t voodoo-backup on the server" >&2
+  fi
+  rm -f "$errf"
+  return "$rc"
+}
+
 ping_hc() {
   [[ -n "$HC_URL" ]] || return 0
-  curl -fsS -m 10 --retry 3 -o /dev/null "$HC_URL$1" || true
+  quiet "healthcheck ping" curl -fsS -m 10 --retry 3 -o /dev/null "$HC_URL$1" || true
 }
 trap 'ping_hc /fail' ERR
 
@@ -85,8 +102,8 @@ gzip -f "$out"  # .gz inherits the 0600 of its input
 
 if (( OFFBOX )); then
   enc="$out.gz.age"
-  age -r "$VOODOO_BACKUP_AGE_RECIPIENT" -o "$enc" "$out.gz"
-  aws s3 cp --only-show-errors "$enc" "${VOODOO_BACKUP_S3_URI%/}/$(basename "$enc")"
+  quiet "age encrypt" age -r "$VOODOO_BACKUP_AGE_RECIPIENT" -o "$enc" "$out.gz"
+  quiet "off-box upload" aws s3 cp --only-show-errors "$enc" "${VOODOO_BACKUP_S3_URI%/}/$(basename "$enc")"
   rm -f "$enc"
 else
   echo "WARNING: off-box backup not configured (see $CONF); local copy only at $out.gz" >&2

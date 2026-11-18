@@ -5,14 +5,20 @@ on:
     branches: [main]
   pull_request:
 
-permissions:
-  contents: read
+# Nothing here writes to GitHub; each job repeats this so a new job does not
+# inherit more by accident.
+permissions: {}
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
@@ -50,8 +56,14 @@ jobs:
 
   deploy:
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Dormant until DEPLOY_ENABLED is true (docs/deploy.md). The host itself
+    # is a secret: a job-level if cannot read secrets, and a variable would be
+    # printed in the step's env block of a public log.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     environment: production
     concurrency:
       group: production
@@ -75,9 +87,24 @@ jobs:
       - name: Deploy
         env:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
-          HOST: ${{ vars.DEPLOY_HOST }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
+          # Secrets are masked whole; ssh errors print the bare host, and a
+          # multi-line secret is not reliably masked line by line.
+          echo "::add-mask::$HOST"
+          echo "::add-mask::${HOST#*@}"
+          while IFS= read -r line; do
+            # Skip blanks and comments: masking "#" would hide every # in the log.
+            case "$line" in ''|'#'*) continue ;; esac
+            echo "::add-mask::$line"
+            # The host field: "name,ip" or "[name]:port", unless hashed.
+            IFS=, read -ra names <<< "${line%% *}"
+            for n in "${names[@]}"; do
+              n="${n#[}"; n="${n%%]*}"
+              echo "::add-mask::$n"
+            done
+          done <<< "$KNOWN_HOSTS"
           install -d -m 0700 ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy
           chmod 0600 ~/.ssh/deploy

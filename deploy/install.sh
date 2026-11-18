@@ -5,6 +5,11 @@ set -euo pipefail
 BIN=/usr/local/bin/voodoo
 ROLLBACK="install -m 0755 $BIN.prev $BIN && systemctl restart voodoo"
 
+# CI pipes this script's output into a public Actions log, so failure detail
+# that can name hosts, addresses or paths goes to the journal (tag
+# voodoo-install) and the log only says where to look.
+journal() { logger -t voodoo-install -p user.err -- "$1" 2>/dev/null || true; }
+
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 tar -xzf - -C "$work" --no-same-owner --no-same-permissions voodoo backup.sh voodoo.service
@@ -35,14 +40,19 @@ set -a; . /etc/voodoo/voodoo.env; set +a
 echo ">> stopping service"
 systemctl stop voodoo
 
+# voodoo has no doctor; migrate is the only preflight. Its errors carry
+# database detail, so on failure they go to the journal.
 echo ">> migrating with the new binary"
-if ! sudo -u voodoo --preserve-env=VOODOO_DB_PATH "$BIN.new" migrate up; then
+if ! migrate_out="$(sudo -u voodoo --preserve-env=VOODOO_DB_PATH "$BIN.new" migrate up 2>&1)"; then
+	journal "migrate up failed: $migrate_out"
 	rm -f "$BIN.new"
 	systemctl start voodoo
-	echo "!! migration failed; old binary restarted. If the schema is now" >&2
+	echo "!! migration failed; old binary restarted. Details: run" >&2
+	echo "!! 'journalctl -t voodoo-install' on the server. If the schema is now" >&2
 	echo "!! inconsistent, restore the backup above (docs/deploy.md)." >&2
 	exit 1
 fi
+printf '%s\n' "$migrate_out"
 
 echo ">> installing (previous binary kept as $BIN.prev)"
 if [[ -f "$BIN" ]]; then cp -p "$BIN" "$BIN.prev"; fi
@@ -62,8 +72,9 @@ for _ in $(seq 10); do
 	fi
 	sleep 1
 done
-systemctl --no-pager --lines=20 status voodoo || true
-echo "!! health check failed. Roll back the binary with:" >&2
+# The service's own log is production data; it stays on the server.
+echo "!! health check failed; run 'journalctl -u voodoo' on the server." >&2
+echo "!! Roll back the binary with:" >&2
 echo "!!   $ROLLBACK" >&2
 echo "!! Migrations are not reversed; see docs/deploy.md for restoring the backup." >&2
 exit 1

@@ -214,7 +214,8 @@ On the server, in order:
 5. Copies the old binary to `/usr/local/bin/voodoo.prev` and installs the new one.
 6. Starts the service and polls `GET /healthz` on the local listen address
    (`VOODOO_BIND`/`VOODOO_PORT`). If it does not answer `ok` within about ten
-   seconds, the deploy fails and prints the rollback command.
+   seconds, the deploy fails and prints the rollback command; the service's
+   log stays on the server (`journalctl -u voodoo`).
 
 ### Rolling back
 
@@ -264,19 +265,65 @@ job in `.github/workflows/ci.yml`. CI never gets root:
 - The job runs in the `production` GitHub environment, which only `main` may
   use. Pull requests, including those from forks, never see its secrets.
 - The server's host key is pinned, and the actions are pinned to commit SHAs.
+- The workflow grants no token permissions beyond `contents: read`, checkouts
+  do not keep the token, and each job times out after 20 minutes.
 
 One-time setup (run `make deploy` once first so `voodoo-install` exists):
 
 ```sh
-ssh-keygen -t ed25519 -N "" -C voodoo-ci -f ci_key
-VOODOO_HOST=root@your-server deploy/ci-setup.sh ci_key.pub
-gh secret set DEPLOY_SSH_KEY --env production < ci_key
-gh variable set DEPLOY_HOST --env production --body deploy@your-server
-gh variable set DEPLOY_KNOWN_HOSTS --env production --body "$(ssh-keyscan -t ed25519 your-server)"
-rm ci_key ci_key.pub
+# A throwaway directory, so the private key never sits in the checkout.
+keydir="$(mktemp -d)"
+ssh-keygen -t ed25519 -N "" -C voodoo-ci -f "$keydir/ci_key"
+VOODOO_HOST=root@your-server deploy/ci-setup.sh "$keydir/ci_key.pub"
+gh secret set DEPLOY_SSH_KEY --env production < "$keydir/ci_key"
+gh secret set DEPLOY_HOST --env production --body deploy@your-server
+gh secret set DEPLOY_KNOWN_HOSTS --env production --body "$(ssh-keyscan -t ed25519 your-server 2>/dev/null | grep -v '^#')"
+gh variable set DEPLOY_ENABLED --body true
+rm -rf "$keydir"
 ```
 
 Revoke CI by deleting `/home/deploy/.ssh/authorized_keys` on the server.
+
+#### Keeping the public log clean
+
+The repository is public, so its Actions logs are too. The deploy keeps the
+server's address, production logs and the backup bucket out of them:
+
+- `DEPLOY_HOST` and `DEPLOY_KNOWN_HOSTS` are environment secrets, not
+  variables: GitHub prints a step's env block in the log, and variables are
+  shown in clear. Whole-secret masking misses the bare host that `ssh` errors
+  print and individual lines of a multi-line secret, so the deploy step also
+  `::add-mask::`s the host, the host after `@`, each known_hosts line and each
+  host name in it.
+- A job-level `if` cannot read secrets (or environment variables), so the job
+  is gated on the repository variable `DEPLOY_ENABLED` being `true` instead.
+  Unset, the deploy job is skipped.
+- On the server, `install.sh` sends a failed `migrate up`'s output to the
+  journal (`journalctl -t voodoo-install`) and answers a failed health check
+  with a pointer to `journalctl -u voodoo` instead of `systemctl status`.
+  `backup.sh` runs `age`, `aws s3 cp` and the healthcheck `curl` through
+  `quiet`, which logs their stderr to the journal
+  (`journalctl -t voodoo-backup`) and prints a generic line. Exit codes are
+  unchanged, and so is what a successful deploy prints.
+
+**Migrating an existing setup** (from `DEPLOY_HOST` and `DEPLOY_KNOWN_HOSTS`
+as `production` environment variables): before pushing this change to `main`,
+create the two environment secrets and the `DEPLOY_ENABLED` repository
+variable (the SSH key stays):
+
+```sh
+gh secret set DEPLOY_HOST --env production --body deploy@your-server
+gh secret set DEPLOY_KNOWN_HOSTS --env production --body "$(ssh-keyscan -t ed25519 your-server 2>/dev/null | grep -v '^#')"
+gh variable set DEPLOY_ENABLED --body true
+```
+
+After the push has deployed, delete the old environment variables, which
+nothing reads any more:
+
+```sh
+gh variable delete DEPLOY_HOST --env production
+gh variable delete DEPLOY_KNOWN_HOSTS --env production
+```
 
 ## Configuration
 

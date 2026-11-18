@@ -16,15 +16,24 @@ coverage.*
 *.db-shm
 *.db-wal
 
-# Local config
+# Local config and secrets
 .env
 .env.*
+*.env
 !.env.example
-
-# Backups and keys (age-encrypted dumps, private keys)
-*.age
+!*.env.example
 *.key
+*.pem
+*.age
+ci_key*
+
+# Backups and restore leftovers (docs/deploy.md)
 *.gz
+*.db.gz
+*.db.broken
+
+# CI release staging (ci.yml)
+stage/
 
 # Editor / OS
 .DS_Store
