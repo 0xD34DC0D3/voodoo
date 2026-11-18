@@ -320,7 +320,7 @@ func TestAdminClientDeleteReportsMisses(t *testing.T) {
 	// The message rides a flash cookie to the page after the redirect, so read it
 	// there rather than fetching /admin/clients without carrying the cookie over.
 	got := flashMessage(t, rr)
-	if !strings.Contains(got, "No such client") {
+	if !strings.Contains(got, "Nothing was deleted") {
 		t.Fatalf("flash = %q, want it to say nothing was deleted", got)
 	}
 
@@ -509,7 +509,7 @@ func TestConsentLabelsHomepageSelfReported(t *testing.T) {
 		t.Fatal(err)
 	}
 	body := e.get(t, "/authorize?"+authzQuery(resp.ClientID).Encode(), ck).Body.String()
-	if !strings.Contains(body, "Homepage (self-reported, unverified)") {
+	if !strings.Contains(body, "Homepage (unverified)") {
 		t.Fatalf("homepage not labelled self-reported: %s", body)
 	}
 }

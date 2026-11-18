@@ -1,13 +1,13 @@
 {{template "top" .}}
 <h1>Invites</h1>
-<p class="backlink"><a href="/admin">cd ..</a> <span class="path">/admin</span></p>
+<p class="backlink"><a href="/admin">← back</a> <span class="path">/admin</span></p>
 {{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
 
 {{if .NewLink}}
 <div class="secret">
-  <p class="warn">Invite created — send this link now, it will not be shown again</p>
+  <p class="warn">Invite created. Copy the link now. It won't be shown again.</p>
   <pre><code>{{.NewLink}}</code></pre>
-  <p class="hint">Click the link to select the whole value, then copy.</p>
+  <p class="hint">Click the link to select it.</p>
 </div>
 {{end}}
 
@@ -16,15 +16,15 @@
   <div class="form-row">
     <label>
       <span>Email</span>
-      <input type="email" name="email" placeholder="blank = open link" value="{{.FormEmail}}" aria-describedby="invite-email-hint">
+      <input type="email" name="email" placeholder="optional" value="{{.FormEmail}}" aria-describedby="invite-email-hint">
     </label>
     <label class="narrow">
-      <span>Expires in days</span>
+      <span>Expires after (days)</span>
       <input type="number" name="expires_in_days" min="1" max="365" inputmode="numeric" value="{{.FormDays}}" required>
     </label>
     <button type="submit">Create invite</button>
   </div>
-  <p class="note" id="invite-email-hint">With an email, the link signs up only that address, once. Leave blank for an open link anyone can use until it expires: treat it like a password, keep the expiry short, and delete it when done.</p>
+  <p class="note" id="invite-email-hint">With an email, the link works once, for that address. Without one, anyone with the link can sign up until it expires, so keep the expiry short and delete it when you're done.</p>
 </form>
 
 <h2>Existing invites</h2>
@@ -71,8 +71,8 @@
     </tbody>
   </table>
 </div>
-<p class="footnote">All times UTC. Deleting an invite revokes its link (open links included) and drops its signup record; the accounts stay.</p>
+<p class="footnote">All times UTC. Deleting an invite disables its link. Accounts created with it stay.</p>
 {{else}}
-<p class="empty">No invites yet — create one above to onboard someone.</p>
+<p class="empty">No invites yet.</p>
 {{end}}
 {{template "bottom" .}}

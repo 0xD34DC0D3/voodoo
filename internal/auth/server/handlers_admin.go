@@ -82,7 +82,7 @@ func (s *Server) requireTargetUser(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		u, err := s.q.GetUserByID(c.Request().Context(), c.Param("id"))
 		if errors.Is(err, sql.ErrNoRows) {
-			return s.renderAdminUsers(c, http.StatusNotFound, "user not found", "", "")
+			return s.renderAdminUsers(c, http.StatusNotFound, "User not found.", "", "")
 		}
 		if err != nil {
 			return err
@@ -133,7 +133,7 @@ func (s *Server) postAdminUserDisable(c echo.Context) error {
 	}
 	id := c.Param("id")
 	if id == me.ID {
-		return s.renderAdminUsers(c, http.StatusBadRequest, "you cannot disable yourself", "", "")
+		return s.renderAdminUsers(c, http.StatusBadRequest, "You can't disable your own account.", "", "")
 	}
 
 	ctx := c.Request().Context()
@@ -151,7 +151,7 @@ func (s *Server) postAdminUserDisable(c echo.Context) error {
 	}); err != nil {
 		return err
 	}
-	s.setFlash(c, "User disabled — their sessions, API keys and connected apps were revoked.")
+	s.setFlash(c, "User disabled. Sessions, API keys, and connected apps revoked.")
 	return c.Redirect(http.StatusFound, "/admin/users")
 }
 
@@ -180,7 +180,7 @@ func (s *Server) postAdminUserRevokeSessions(c echo.Context) error {
 		return err
 	}
 
-	s.setFlash(c, "Sessions, API keys and connected apps revoked.")
+	s.setFlash(c, "Sessions, API keys, and connected apps revoked.")
 	return c.Redirect(http.StatusFound, "/admin/users")
 }
 
@@ -208,7 +208,7 @@ func revokeAllCredentials(ctx context.Context, q *store.Queries, userID string) 
 }
 
 func (s *Server) postAdminUserPromote(c echo.Context) error {
-	return s.setUserAdmin(c, true, "User promoted to admin.")
+	return s.setUserAdmin(c, true, "User is now an admin.")
 }
 
 func (s *Server) postAdminUserDemote(c echo.Context) error {
@@ -219,9 +219,9 @@ func (s *Server) postAdminUserDemote(c echo.Context) error {
 	// Prevent admin lockout via the web UI: an admin can't demote themselves.
 	// CLI `voodoo admin demote` is unrestricted (local operator, trusted).
 	if c.Param("id") == me.ID {
-		return s.renderAdminUsers(c, http.StatusBadRequest, "you cannot demote yourself", "", "")
+		return s.renderAdminUsers(c, http.StatusBadRequest, "You can't remove your own admin role.", "", "")
 	}
-	return s.setUserAdmin(c, false, "User demoted to user.")
+	return s.setUserAdmin(c, false, "User is no longer an admin.")
 }
 
 func (s *Server) setUserAdmin(c echo.Context, isAdmin bool, flash string) error {
@@ -333,7 +333,7 @@ func (s *Server) postAdminInvites(c echo.Context) error {
 	if formDays != "" {
 		n, err := strconv.Atoi(formDays)
 		if err != nil || n <= 0 || n > maxInviteDays {
-			return s.renderAdminInvites(c, http.StatusBadRequest, "expires_in_days must be between 1 and 365", "", formEmail, formDays)
+			return s.renderAdminInvites(c, http.StatusBadRequest, "Expiry must be between 1 and 365 days.", "", formEmail, formDays)
 		}
 		days = n
 	}

@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -16,7 +17,10 @@ import (
 
 // invalidResetErr is deliberately vague: the reset page is public, so it must
 // not reveal whether a token ever existed, only that this one won't work.
-const invalidResetErr = "this reset link is invalid, expired, or already used"
+const invalidResetErr = "This reset link is invalid, expired, or already used."
+
+// passwordTooShortErr is what signup and reset show when password.CheckNew fails.
+var passwordTooShortErr = fmt.Sprintf("Use at least %d characters for your password.", password.MinLength)
 
 type resetView struct {
 	web.Chrome
@@ -52,15 +56,15 @@ func (s *Server) postReset(c echo.Context) error {
 	}
 	if pw == "" {
 		return s.render(c, http.StatusBadRequest, "reset.html",
-			s.resetView(c, "password is required", token))
+			s.resetView(c, "Enter a new password.", token))
 	}
 	if err := password.CheckNew(pw); err != nil {
 		return s.render(c, http.StatusBadRequest, "reset.html",
-			s.resetView(c, err.Error(), token))
+			s.resetView(c, passwordTooShortErr, token))
 	}
 	if pw != confirm {
 		return s.render(c, http.StatusBadRequest, "reset.html",
-			s.resetView(c, "passwords do not match", token))
+			s.resetView(c, "Passwords don't match.", token))
 	}
 
 	hash, err := s.hashPassword(c, pw)
@@ -105,7 +109,7 @@ func (s *Server) postReset(c echo.Context) error {
 	}
 	logEvent(c, "auth.password_reset", "user", userID)
 
-	s.setFlash(c, "Password updated — please log in.")
+	s.setFlash(c, "Password updated. Sign in again.")
 	return c.Redirect(http.StatusFound, "/login")
 }
 

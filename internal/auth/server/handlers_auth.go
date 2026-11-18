@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	genericLoginErr  = "invalid email or password"
-	invalidInviteErr = "invite is missing, invalid, or already used"
+	genericLoginErr  = "Wrong email or password."
+	invalidInviteErr = "This invite link is invalid, expired, or already used."
 )
 
 // dummyHash is used to keep timing on unknown-email login attempts comparable.
@@ -149,7 +149,7 @@ type loginView struct {
 }
 
 func (s *Server) loginView(c echo.Context, errMsg, email, next string) loginView {
-	return loginView{Chrome: s.pageChrome(c, "log in"), Error: errMsg, Email: email, Next: next}
+	return loginView{Chrome: s.pageChrome(c, "sign in"), Error: errMsg, Email: email, Next: next}
 }
 
 func (s *Server) getLogin(c echo.Context) error {
@@ -249,11 +249,11 @@ func (s *Server) postSettingsTimezone(c echo.Context) error {
 	// LoadLocation can accept it.
 	if strings.EqualFold(tz, "Local") {
 		return s.renderHome(c, http.StatusBadRequest,
-			"unknown timezone — use an IANA name like America/Chicago")
+			"Unknown timezone. Pick one from the list.")
 	}
 	if _, err := time.LoadLocation(tz); err != nil {
 		return s.renderHome(c, http.StatusBadRequest,
-			"unknown timezone — use an IANA name like America/Chicago")
+			"Unknown timezone. Pick one from the list.")
 	}
 	if err := s.q.SetUserTimezone(c.Request().Context(), store.SetUserTimezoneParams{
 		Timezone: tz,
@@ -325,15 +325,15 @@ func (s *Server) postSignup(c echo.Context) error {
 	// A bound invite only signs up its own email, whatever the form says.
 	if inv.Email.Valid && email != inv.Email.String {
 		return s.render(c, http.StatusBadRequest, "signup.html",
-			s.signupView(c, "this invite is for a different email", token, inv.Email.String, true, next))
+			s.signupView(c, "This invite is for a different email address.", token, inv.Email.String, true, next))
 	}
 	if email == "" || pw == "" {
 		return s.render(c, http.StatusBadRequest, "signup.html",
-			s.signupView(c, "email and password are required", token, email, inv.Email.Valid, next))
+			s.signupView(c, "Enter an email and a password.", token, email, inv.Email.Valid, next))
 	}
 	if err := password.CheckNew(pw); err != nil {
 		return s.render(c, http.StatusBadRequest, "signup.html",
-			s.signupView(c, err.Error(), token, email, inv.Email.Valid, next))
+			s.signupView(c, passwordTooShortErr, token, email, inv.Email.Valid, next))
 	}
 
 	hash, err := s.hashPassword(c, pw)
@@ -358,7 +358,7 @@ func (s *Server) postSignup(c echo.Context) error {
 	})
 	if err != nil {
 		return s.render(c, http.StatusBadRequest, "signup.html",
-			s.signupView(c, "could not create account (email may already be taken)", token, email, inv.Email.Valid, next))
+			s.signupView(c, "Couldn't create the account. That email may already be in use.", token, email, inv.Email.Valid, next))
 	}
 
 	// ExpiresAt below is the "expires_at > ?" threshold, not a new expiry.

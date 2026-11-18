@@ -298,7 +298,7 @@ func TestAdminInvitesListShowsKindAndUsage(t *testing.T) {
 	req.AddCookie(ck)
 	rr := e.do(t, req)
 	body := rr.Body.String()
-	for _, want := range []string{">open<", "2 signups", "o1@example.com", "used by bound@example.com", "leave blank for an open link"} {
+	for _, want := range []string{">open<", "2 signups", "o1@example.com", "used by bound@example.com", "without one, anyone with the link"} {
 		if !strings.Contains(strings.ToLower(body), strings.ToLower(want)) {
 			t.Errorf("invites page missing %q", want)
 		}

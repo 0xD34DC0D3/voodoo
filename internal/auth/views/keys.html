@@ -7,15 +7,15 @@
   <div class="form-row">
     <label>
       <span>Name</span>
-      <input type="text" name="name" required maxlength="100" placeholder="e.g. laptop CLI" value="{{.Name}}" autofocus>
+      <input type="text" name="name" required maxlength="100" placeholder="laptop" value="{{.Name}}" autofocus>
     </label>
     <label class="narrow">
-      <span>Expires in days</span>
+      <span>Expires after (days)</span>
       <input type="number" name="expires_in_days" min="1" max="3650" inputmode="numeric" placeholder="never" value="{{.Days}}">
     </label>
     <button type="submit">Create key</button>
   </div>
-  <p class="note">Leave expiry blank for a key that never expires (1–3650 days otherwise).</p>
+  <p class="note">Leave expiry blank for a key that never expires.</p>
 </form>
 
 <h2>Your keys</h2>
@@ -44,7 +44,7 @@
           <details class="confirm">
             <summary>Delete</summary>
             <div class="confirm-pop">
-              <span>Revoke this key?</span>
+              <span>Delete this key?</span>
               <form method="post" action="/keys/{{.ID}}/delete">
                 <button type="submit" class="danger">Yes, delete</button>
               </form>
@@ -58,6 +58,6 @@
 </div>
 <p class="footnote">All times UTC. Deleting a key revokes it immediately.</p>
 {{else}}
-<p class="empty">No keys yet — create one above to use voodoo from the CLI.</p>
+<p class="empty">No keys yet.</p>
 {{end}}
 {{template "bottom" .}}

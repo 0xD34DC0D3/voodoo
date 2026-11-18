@@ -350,7 +350,7 @@ pre {
   margin-top: var(--s3);
 }
 
-/* a shell-style back link: "cd .." with the path it returns to */
+/* a back link with the path it returns to */
 .backlink {
   font: 0.75rem var(--mono);
   margin: calc(-1 * var(--s4)) 0 var(--s4);

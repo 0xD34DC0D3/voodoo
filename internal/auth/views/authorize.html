@@ -8,7 +8,7 @@
   </p>
 
   {{if .ClientURI}}
-  <p class="note">Homepage (self-reported, unverified): <a href="{{.ClientURI}}" rel="noopener noreferrer" target="_blank">{{.ClientURI}}</a></p>
+  <p class="note">Homepage (unverified): <a href="{{.ClientURI}}" rel="noopener noreferrer" target="_blank">{{.ClientURI}}</a></p>
   {{end}}
 
   <h2>It will be able to</h2>
@@ -16,17 +16,16 @@
     {{range .Scopes}}<li>{{.}}</li>{{end}}
   </ul>
 
-  <h2>Approving will send your access to</h2>
+  <h2>Approving sends access to</h2>
   <p class="destination">
     <strong>{{.RedirectHost}}</strong>
     <br><code>{{.RedirectURI}}</code>
   </p>
 
   <p class="warn" role="note">
-    Anyone can register an app with this server, so the name and homepage above are
-    <em>self-reported</em> — it is not vouched for by voodoo. The host that
-    receives your access is the one line here that an attacker cannot dress up:
-    if you do not recognise it, deny this.
+    Anyone can register an app here, so its name and homepage are
+    <em>unverified</em>. The host above is the one detail that can't be faked.
+    If you don't recognize it, deny.
   </p>
 
   <form method="post" action="/authorize">
@@ -46,7 +45,7 @@
   </form>
 
   <p class="footnote">
-    This approval lasts {{.Expiry}} and can be withdrawn at any time from
+    This approval lasts {{.Expiry}}. You can revoke it any time from
     <a href="/connections">connected apps</a>.
   </p>
 </div>

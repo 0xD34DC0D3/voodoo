@@ -1,15 +1,12 @@
 {{template "top" .}}
 <h1>OAuth clients</h1>
-<p class="backlink"><a href="/admin">cd ..</a> <span class="path">/admin</span></p>
+<p class="backlink"><a href="/admin">← back</a> <span class="path">/admin</span></p>
 
 <p class="note">
-  Clients register themselves, so a row here means some software asked for a
-  <code>client_id</code> — nothing more. A registration on its own grants nothing:
-  every connection still needs a user to approve it, and shows up under that user's
-  connected apps. <strong>First approved by</strong> names the first person who ever
-  did, which is the closest thing a self-registered client has to an owner; a client
-  nobody has approved holds no access at all. Deleting a client here revokes its
-  tokens for every user at once.
+  Apps register themselves, so a row here grants nothing on its own. Access
+  starts only when a user approves it. <strong>First approved by</strong> is the
+  closest thing a client has to an owner. Deleting a client revokes its tokens
+  for everyone.
 </p>
 
 {{if .Clients}}

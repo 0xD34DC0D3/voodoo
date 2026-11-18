@@ -240,7 +240,7 @@ func TestPasswordResetMismatchKeepsForm(t *testing.T) {
 		t.Fatalf("mismatch status=%d, want 400", rr.Code)
 	}
 	body := rr.Body.String()
-	if !strings.Contains(body, "passwords do not match") {
+	if !strings.Contains(body, "Passwords don&#39;t match.") {
 		t.Fatalf("expected mismatch error, got: %s", body)
 	}
 	// Token preserved in the form so the user can retry.

@@ -2,8 +2,8 @@
 <h1>Connected apps</h1>
 
 <p class="note">
-  Apps you approved to act as you, via OAuth. Each row is one approval: the same
-  app connecting to two different addresses is two approvals, revocable separately.
+  Apps you've allowed to act as you. An app connected to two addresses shows up
+  twice, and each can be revoked on its own.
 </p>
 
 {{if .Connections}}
@@ -54,13 +54,12 @@
   </table>
 </div>
 <p class="footnote">
-  All times UTC. Revoking takes effect immediately and cannot be undone — the app
-  has to ask for your approval again.
+  All times UTC. Revoking is immediate. The app will need your approval to
+  reconnect.
 </p>
 {{else}}
 <p class="empty">
-  No connected apps. When an app sends you here to approve an OAuth connection,
-  it will show up on this page.
+  No connected apps. Apps you approve will show up here.
 </p>
 {{end}}
 {{template "bottom" .}}

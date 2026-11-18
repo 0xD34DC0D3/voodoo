@@ -58,17 +58,17 @@ func (s *Server) postKeys(c echo.Context) error {
 	name := strings.TrimSpace(c.FormValue("name"))
 	days := strings.TrimSpace(c.FormValue("expires_in_days"))
 	if name == "" {
-		return s.renderKeysList(c, http.StatusBadRequest, "name is required", name, days)
+		return s.renderKeysList(c, http.StatusBadRequest, "Give the key a name.", name, days)
 	}
 	if len(name) > maxKeyNameLen {
-		return s.renderKeysList(c, http.StatusBadRequest, "name is too long", name, days)
+		return s.renderKeysList(c, http.StatusBadRequest, "That name is too long. Keep it under 100 characters.", name, days)
 	}
 
 	var expiresAt sql.NullTime
 	if days != "" {
 		n, err := strconv.Atoi(days)
 		if err != nil || n <= 0 || n > maxKeyDays {
-			return s.renderKeysList(c, http.StatusBadRequest, "expires_in_days must be between 1 and 3650", name, days)
+			return s.renderKeysList(c, http.StatusBadRequest, "Expiry must be between 1 and 3650 days.", name, days)
 		}
 		expiresAt = sql.NullTime{Time: time.Now().UTC().Add(time.Duration(n) * 24 * time.Hour), Valid: true}
 	}

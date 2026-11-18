@@ -160,7 +160,7 @@ func (s *Server) postConnectionsRevoke(c echo.Context) error {
 		return err
 	}
 
-	s.setFlash(c, "Access revoked — the app must be authorized again to reconnect.")
+	s.setFlash(c, "Access revoked.")
 	return c.Redirect(http.StatusFound, "/connections")
 }
 
@@ -199,9 +199,9 @@ func (s *Server) postAdminClientDelete(c echo.Context) error {
 	// Claiming tokens were revoked when nothing matched would be the worst kind of
 	// wrong: an admin containing an incident deserves to know the button missed.
 	if n == 0 {
-		s.setFlash(c, "No such client — nothing was deleted.")
+		s.setFlash(c, "Client not found. Nothing was deleted.")
 	} else {
-		s.setFlash(c, "Client deleted — its tokens were revoked for all users.")
+		s.setFlash(c, "Client deleted. Its tokens are revoked for everyone.")
 	}
 	return c.Redirect(http.StatusFound, "/admin/clients")
 }

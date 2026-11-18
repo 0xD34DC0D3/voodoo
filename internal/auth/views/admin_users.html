@@ -1,13 +1,13 @@
 {{template "top" .}}
 <h1>Users</h1>
-<p class="backlink"><a href="/admin">cd ..</a> <span class="path">/admin</span></p>
+<p class="backlink"><a href="/admin">← back</a> <span class="path">/admin</span></p>
 {{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
 
 {{if .ResetLink}}
 <div class="secret">
-  <p class="warn">Password reset link for {{.ResetEmail}} — send it now, it will not be shown again</p>
+  <p class="warn">Reset link for {{.ResetEmail}}. Copy it now. It won't be shown again.</p>
   <pre><code>{{.ResetLink}}</code></pre>
-  <p class="hint">Expires in 1 hour and works only once. Anyone with the link can set this account's password, so share it privately.</p>
+  <p class="hint">Works once, for 1 hour. Anyone with it can set this password, so send it privately.</p>
 </div>
 {{end}}
 
@@ -60,17 +60,17 @@
             </details>
             {{if .IsAdmin}}
             <details class="confirm neutral">
-              <summary>Demote</summary>
+              <summary>Remove admin</summary>
               <div class="confirm-pop">
-                <span>Demote {{.Email}} to user?</span>
+                <span>Remove admin from {{.Email}}?</span>
                 <form method="post" action="/admin/users/{{.ID}}/demote">
-                  <button type="submit" class="ghost">Yes, demote</button>
+                  <button type="submit" class="ghost">Yes, remove</button>
                 </form>
               </div>
             </details>
             {{else}}
             <form method="post" action="/admin/users/{{.ID}}/promote">
-              <button type="submit" class="ghost">Promote</button>
+              <button type="submit" class="ghost">Make admin</button>
             </form>
             {{end}}
             <form method="post" action="/admin/users/{{.ID}}/reset">
@@ -84,5 +84,5 @@
     </tbody>
   </table>
 </div>
-<p class="footnote">All times UTC. Disable, revoke and a completed password reset all delete the user's sessions, API keys and connected apps.</p>
+<p class="footnote">All times UTC. Disabling, revoking sessions, and completing a password reset all sign the user out and remove their API keys and connected apps.</p>
 {{template "bottom" .}}

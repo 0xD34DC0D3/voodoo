@@ -5,9 +5,8 @@
 <p class="note">Error code: <code>{{.Code}}</code></p>
 
 <p>
-  Nothing was authorized. This request was stopped before voodoo would send a
-  response back to the app, because the app did not identify itself in a way that
-  could be trusted with one — so there is nowhere safe to return you to.
+  Nothing was authorized. The app didn't identify itself in a way voodoo can
+  trust, so there's no safe place to send you back to.
 </p>
-<p class="footnote">Start again from the app, or head <a href="/">home</a>.</p>
+<p class="footnote">Start again from the app, or go <a href="/">home</a>.</p>
 {{template "bottom" .}}

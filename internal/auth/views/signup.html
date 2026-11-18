@@ -4,7 +4,7 @@
   {{if .Error}}<p class="error" role="alert">{{.Error}}</p>{{end}}
 
   {{if .Invite}}
-  <p class="note">You've been invited. {{if .Bound}}Pick a password for the email below.{{else}}Pick your email and password below.{{end}}</p>
+  <p class="note">You've been invited. {{if .Bound}}Pick a password for the email below.{{else}}Pick an email and password below.{{end}} Passwords need at least 15 characters.</p>
   <form method="post" action="/signup">
     <input type="hidden" name="invite" value="{{.Invite}}">
     {{if .Next}}<input type="hidden" name="next" value="{{.Next}}">{{end}}
@@ -19,8 +19,8 @@
     <button type="submit">Create account</button>
   </form>
   {{else}}
-  <p class="note">Signing up requires a valid invite link. If yours expired or was already used, ask an admin to send a new one.</p>
-  <p class="note">Already have an account? <a href="/login{{if .Next}}?next={{.Next | urlquery}}{{end}}">Log in</a>.</p>
+  <p class="note">You need an invite link to sign up. If yours expired or was used, ask an admin for a new one.</p>
+  <p class="note">Already have an account? <a href="/login{{if .Next}}?next={{.Next | urlquery}}{{end}}">Sign in</a>.</p>
   {{end}}
 </div>
 {{template "bottom" .}}

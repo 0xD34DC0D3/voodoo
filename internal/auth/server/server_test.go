@@ -322,7 +322,7 @@ func TestLoginWrongPasswordGeneric(t *testing.T) {
 		t.Fatalf("status=%d", rr.Code)
 	}
 	body, _ := io.ReadAll(rr.Body)
-	if !strings.Contains(string(body), "invalid email or password") {
+	if !strings.Contains(string(body), "Wrong email or password.") {
 		t.Fatalf("expected generic error in body, got: %s", body)
 	}
 }
@@ -343,7 +343,7 @@ func TestLoginDisabledUserGeneric(t *testing.T) {
 		t.Fatalf("status=%d", rr.Code)
 	}
 	body, _ := io.ReadAll(rr.Body)
-	if !strings.Contains(string(body), "invalid email or password") {
+	if !strings.Contains(string(body), "Wrong email or password.") {
 		t.Fatalf("expected generic error, got: %s", body)
 	}
 	if sessionCookie(rr) != nil {
@@ -423,7 +423,7 @@ func TestSettingsTimezone(t *testing.T) {
 	if rr.Code != http.StatusBadRequest {
 		t.Fatalf("invalid tz status=%d", rr.Code)
 	}
-	if !strings.Contains(rr.Body.String(), "unknown timezone") {
+	if !strings.Contains(rr.Body.String(), "Unknown timezone") {
 		t.Fatalf("expected timezone error in body, got: %s", rr.Body.String())
 	}
 	if got := tzOf(); got != "UTC" {
@@ -466,7 +466,7 @@ func TestSettingsTimezone(t *testing.T) {
 		if rr.Code != http.StatusBadRequest {
 			t.Fatalf("%q status=%d, want 400", tz, rr.Code)
 		}
-		if !strings.Contains(rr.Body.String(), "unknown timezone") {
+		if !strings.Contains(rr.Body.String(), "Unknown timezone") {
 			t.Fatalf("%q: expected timezone error, got: %s", tz, rr.Body.String())
 		}
 	}
