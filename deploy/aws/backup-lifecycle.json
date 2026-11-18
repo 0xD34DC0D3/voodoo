@@ -9,7 +9,7 @@
       "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
     },
     {
-      "ID": "clean-expired-delete-markers",
+      "ID": "clean-voodoo-expired-delete-markers",
       "Status": "Enabled",
       "Filter": { "Prefix": "voodoo/" },
       "Expiration": { "ExpiredObjectDeleteMarker": true }

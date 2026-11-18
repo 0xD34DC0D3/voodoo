@@ -2,7 +2,7 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "PutBackupsOnly",
+      "Sid": "PutVoodooBackupsOnly",
       "Effect": "Allow",
       "Action": "s3:PutObject",
       "Resource": "arn:aws:s3:::BUCKET_NAME/voodoo/*"

@@ -139,16 +139,37 @@ One-time setup:
    password manager, for example). It is the only way to restore an off-box
    backup.
 
-2. **S3 bucket:** private (block public access on), versioning on, lifecycle
-   from `deploy/aws/backup-lifecycle.json`:
+2. **S3 bucket:** private (all four public access blocks on), versioning on,
+   lifecycle from `deploy/aws/backup-lifecycle.json`:
    ```sh
    aws s3api create-bucket --bucket BUCKET_NAME
+   aws s3api put-public-access-block --bucket BUCKET_NAME \
+     --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
    aws s3api put-bucket-versioning --bucket BUCKET_NAME \
      --versioning-configuration Status=Enabled
    aws s3api put-bucket-lifecycle-configuration --bucket BUCKET_NAME \
      --lifecycle-configuration file://deploy/aws/backup-lifecycle.json
    ```
    Outside `us-east-1`, add `--create-bucket-configuration LocationConstraint=REGION`.
+
+   S3 allows one lifecycle configuration per bucket, and
+   `put-bucket-lifecycle-configuration` replaces it whole. The last command
+   above is right only for a new, empty bucket. Other apps (scry, apps made
+   from the template) share this bucket under their own prefix and add their
+   own rules, so once they have, putting this file alone deletes theirs.
+   To add or update voodoo's rules on a shared bucket, merge:
+   ```sh
+   aws s3api get-bucket-lifecycle-configuration --bucket BUCKET_NAME > lifecycle-current.json
+   jq --slurpfile app deploy/aws/backup-lifecycle.json \
+     '{Rules: ([.Rules[] | select(.Filter.Prefix != "voodoo/")] + $app[0].Rules)}' \
+     lifecycle-current.json > lifecycle-merged.json
+   aws s3api put-bucket-lifecycle-configuration --bucket BUCKET_NAME \
+     --lifecycle-configuration file://lifecycle-merged.json
+   ```
+   The `jq` keeps every other app's rules and swaps in this app's, so it is
+   safe to re-run. If the `get` fails with `NoSuchLifecycleConfiguration`, the
+   bucket has no rules yet: put the file directly. Keep rule IDs prefixed
+   with the app name (`expire-voodoo-backups`) so apps' rules never clash.
 
 3. **IAM user** with only `deploy/aws/backup-iam-policy.json` attached
    (`s3:PutObject` on `BUCKET_NAME/voodoo/*`; edit the bucket name in the
@@ -161,10 +182,17 @@ One-time setup:
    ```sh
    apt-get install -y sqlite3 age
    snap install aws-cli --classic
-   install -m 0600 -o root -g root /dev/null /etc/voodoo/backup.env
-   # fill in from deploy/backup.env.example
+   install -m 0600 -o root -g root /dev/null /etc/voodoo/backup.env.new
+   # fill in backup.env.new from deploy/backup.env.example, then:
+   mv /etc/voodoo/backup.env.new /etc/voodoo/backup.env
    ```
-   and add to root's crontab (`crontab -e`):
+   Write the config to a temp file (root:root 0600) and `mv` it into place,
+   now and on every later edit: a CI deploy runs the backup script before
+   installing, and a half-written `backup.env` fails the backup and with it
+   the deploy. The rename is atomic, so the script sees the old file or the
+   new one.
+
+   Then add to root's crontab (`crontab -e`):
    ```
    15 4 * * * /usr/local/bin/voodoo-backup
    ```
