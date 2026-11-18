@@ -115,7 +115,7 @@ Public
   GET  /reset            POST /reset         (requires ?token=<token>; POST rate-limited)
 
 RequireIdentity (either session cookie OR ak_ bearer)
-  GET  /me               → JSON {id, email, is_admin, timezone}
+  GET  /me               → JSON {id, email, is_admin, timezone[, key: {id, name}]}
 
 RequireUser (UI cookie OR ak_ bearer)
   GET  /                 POST /settings/timezone
@@ -179,7 +179,7 @@ Every response carries `Content-Security-Policy: default-src 'self'; base-uri 'n
 The integration seam every downstream app calls.
 
 - Accepts `voodoo_session` (or the UI cookie) OR `Authorization: Bearer ak_…`. A cookie wins if both are sent.
-- Returns 200 with `{id, email, is_admin, timezone}` on success.
+- Returns 200 with `{id, email, is_admin, timezone}` on success. When an API key authenticated the call, the body also has `key: {id, name}`; cookie-authenticated responses have no `key` field.
 - Returns 401 otherwise — no body.
 - Touches `last_used_at` on the session or API key row.
 

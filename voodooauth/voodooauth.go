@@ -109,7 +109,8 @@ type state struct {
 }
 
 // UserFrom returns the signed-in user, or nil for anonymous requests and
-// requests that did not pass through Middleware.
+// requests that did not pass through Middleware. The *User is shared with
+// other requests through the cache: treat it as read-only.
 func UserFrom(ctx context.Context) *User {
 	s, _ := ctx.Value(ctxKey{}).(state)
 	return s.user
