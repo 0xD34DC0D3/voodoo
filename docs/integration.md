@@ -71,6 +71,16 @@ integration is an HTML form in your app posting directly to
 - No registration on the voodoo side — every authenticated user can reach
   every app.
 
+## Go apps: `voodooauth`
+
+Go apps don't have to write the checklist above themselves. Package
+[`voodooauth`](../voodooauth) (`github.com/0xD34DC0D3/voodoo/voodooauth`,
+stdlib only) implements it as plain `net/http` middleware: `Middleware` puts
+the user on the context, `RequireUser` / `RequireAdmin` enforce, `LoginURL` /
+`LogoutURL` feed your templates. Set `AppURL` to your app's external origin so
+`next=` never comes from the `Host` header. When voodoo is unreachable,
+protected routes answer `503` rather than sending a signed-in user to log in.
+
 ## Connecting AI clients (OAuth)
 
 The cookie contract above covers apps you wrote. For software you didn't — an MCP
