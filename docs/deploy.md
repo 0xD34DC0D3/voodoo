@@ -263,7 +263,8 @@ job in `.github/workflows/ci.yml`. CI never gets root:
 - `voodoo-install` is installed only by `make deploy` (root), so CI can't
   replace it.
 - The job runs in the `production` GitHub environment, which only `main` may
-  use. Pull requests, including those from forks, never see its secrets.
+  use (set up below). Pull requests, including those from forks, never see its
+  secrets.
 - The server's host key is pinned, and the actions are pinned to commit SHAs.
 - The workflow grants no token permissions beyond `contents: read`, checkouts
   do not keep the token, and each job times out after 20 minutes.
@@ -282,12 +283,30 @@ gh variable set DEPLOY_ENABLED --body true
 rm -rf "$keydir"
 ```
 
+Then let only `main` use the `production` environment. Without this, anyone
+with write access could push a branch whose own `ci.yml` runs a job in
+`production` and reads its secrets, SSH key included; with it, only `main` can
+(replace OWNER/REPO):
+
+```sh
+gh api -X PUT repos/OWNER/REPO/environments/production --input - <<'EOF'
+{"deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}
+EOF
+gh api -X POST repos/OWNER/REPO/environments/production/deployment-branch-policies -f name=main -f type=branch
+```
+
+Also protect `main` (require pull requests, block force pushes), so getting
+code onto it takes more than write access.
+
 Revoke CI by deleting `/home/deploy/.ssh/authorized_keys` on the server.
 
 #### Keeping the public log clean
 
 The repository is public, so its Actions logs are too. The deploy keeps the
-server's address, production logs and the backup bucket out of them:
+SSH user and port, sshd's banner, production logs (journal output), the
+backup bucket's name and the healthcheck URL out of them. It does not hide the
+server's IP: the DNS A record for `auth.example.com` makes that public
+anyway, so masking it is only defence in depth.
 
 - `DEPLOY_HOST` and `DEPLOY_KNOWN_HOSTS` are environment secrets, not
   variables: GitHub prints a step's env block in the log, and variables are

@@ -26,6 +26,10 @@ coverage.*
 *.pem
 *.age
 ci_key*
+id_ed25519*
+id_rsa*
+id_ecdsa*
+key.txt
 
 # Backups and restore leftovers (docs/deploy.md)
 *.gz

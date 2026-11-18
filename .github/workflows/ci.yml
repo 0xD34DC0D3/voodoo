@@ -95,14 +95,18 @@ jobs:
           echo "::add-mask::$HOST"
           echo "::add-mask::${HOST#*@}"
           while IFS= read -r line; do
+            line="${line%$'\r'}"
+            line="${line#"${line%%[![:space:]]*}"}"
             # Skip blanks and comments: masking "#" would hide every # in the log.
             case "$line" in ''|'#'*) continue ;; esac
             echo "::add-mask::$line"
+            # A marker (@cert-authority, @revoked) comes before the host field.
+            case "$line" in '@'*) line="${line#* }" ;; esac
             # The host field: "name,ip" or "[name]:port", unless hashed.
             IFS=, read -ra names <<< "${line%% *}"
             for n in "${names[@]}"; do
-              n="${n#[}"; n="${n%%]*}"
-              echo "::add-mask::$n"
+              n="${n#!}"; n="${n#[}"; n="${n%%]*}"
+              [ -z "$n" ] || echo "::add-mask::$n"
             done
           done <<< "$KNOWN_HOSTS"
           install -d -m 0700 ~/.ssh
